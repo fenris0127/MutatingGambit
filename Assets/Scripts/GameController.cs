@@ -32,7 +32,46 @@ namespace MutatingGambit
         void Start()
         {
             InitializeGame();
+            SetupUI();
             UpdateDisplay();
+        }
+
+        void SetupUI()
+        {
+            // Setup BoardText
+            if (boardText != null)
+            {
+                boardText.fontSize = 24;
+                boardText.alignment = TextAlignmentOptions.TopLeft;
+                boardText.enableWordWrapping = false;
+            }
+
+            // Setup GameStateText
+            if (gameStateText != null)
+            {
+                gameStateText.fontSize = 18;
+                gameStateText.alignment = TextAlignmentOptions.TopLeft;
+            }
+
+            // Setup InputField
+            if (inputField != null)
+            {
+                inputField.ActivateInputField();
+            }
+        }
+
+        void Update()
+        {
+            // Check for Enter key press
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+            {
+                if (inputField != null && !string.IsNullOrEmpty(inputField.text))
+                {
+                    ProcessPlayerInput(inputField.text);
+                    inputField.text = "";
+                    inputField.ActivateInputField();
+                }
+            }
         }
 
         void InitializeGame()
@@ -65,22 +104,6 @@ namespace MutatingGambit
             if (gameStateText != null)
             {
                 gameStateText.text = _gameStateDisplay.RenderFullGameState(_board);
-            }
-        }
-
-        public void OnInputSubmit(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return;
-
-            // Parse input like "e2" or "e2-e4"
-            ProcessPlayerInput(input);
-
-            // Clear input field
-            if (inputField != null)
-            {
-                inputField.text = "";
-                inputField.ActivateInputField();
             }
         }
 
