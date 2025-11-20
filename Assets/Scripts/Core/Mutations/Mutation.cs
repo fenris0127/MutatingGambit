@@ -1,3 +1,5 @@
+using MutatingGambit.Core.Movement;
+
 namespace MutatingGambit.Core.Mutations
 {
     /// <summary>
@@ -8,6 +10,14 @@ namespace MutatingGambit.Core.Mutations
         public abstract string Name { get; }
         public abstract string Description { get; }
         public virtual int Cost => 50;
+
+        /// <summary>
+        /// Applies this mutation to a move rule
+        /// </summary>
+        public virtual IMoveRule ApplyToMoveRule(IMoveRule baseRule, Piece piece)
+        {
+            return baseRule; // Default: no modification
+        }
 
         public override string ToString()
         {

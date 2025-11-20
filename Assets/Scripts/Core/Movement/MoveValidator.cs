@@ -19,14 +19,14 @@ namespace MutatingGambit.Core.Movement
             }
 
             IMoveRule moveRule = MoveRuleFactory.GetMoveRule(piece);
-            var possibleMoves = moveRule.GetPossibleMoves(board, position, piece);
 
-            // Apply mutations if any
+            // Apply mutations to the move rule
             foreach (var mutation in piece.Mutations)
             {
-                // Mutations will modify the move list in future implementations
-                // For now, this is a placeholder for the mutation system
+                moveRule = mutation.ApplyToMoveRule(moveRule, piece);
             }
+
+            var possibleMoves = moveRule.GetPossibleMoves(board, position, piece);
 
             return possibleMoves;
         }
