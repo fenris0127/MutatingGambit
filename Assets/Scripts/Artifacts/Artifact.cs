@@ -25,15 +25,6 @@ namespace MutatingGambit.Core.Artifacts
 
         private bool _isActive = true;
 
-
-        public abstract string Name { get; }
-
-        public abstract string Description { get; }
-
-        public virtual int Cost => 100;
-
-        public virtual ArtifactTrigger Trigger => ArtifactTrigger.OnMove;
-
         public virtual int Priority
         {
            get { return _priority; }
