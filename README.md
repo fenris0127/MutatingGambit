@@ -2,12 +2,14 @@
 
 A roguelike chess game where the rules mutate as you play, rewarding **creative adaptation** over perfect moves.
 
-![Tests](https://img.shields.io/badge/tests-247%2F247%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-180%2F180%20passing-brightgreen)
 ![.NET](https://img.shields.io/badge/.NET-6.0-blue)
 ![TDD](https://img.shields.io/badge/methodology-TDD-orange)
 ![Optimized](https://img.shields.io/badge/performance-optimized-green)
-![CI/CD](https://img.shields.io/badge/CI%2FCD-automated-success)
+![Complete](https://img.shields.io/badge/status-core%20complete-success)
 ![License](https://img.shields.io/badge/license-MIT-blue)
+
+> **📝 TDD Implementation**: This project was built entirely using Test-Driven Development (Red-Green-Refactor). See [TDD_SUMMARY.md](TDD_SUMMARY.md) for the complete development journey across 10 phases with 180 passing tests.
 
 ## Overview
 
