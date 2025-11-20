@@ -25,7 +25,7 @@ namespace MutatingGambit.Tests
 
             // Assert
             Assert.AreEqual(1, piece.Mutations.Count);
-            Assert.Contains(mutation, piece.Mutations);
+            CollectionAssert.Contains(piece.Mutations, mutation);
         }
 
         [Test]
@@ -337,7 +337,7 @@ namespace MutatingGambit.Tests
 
             // Assert
             Assert.AreEqual(1, piece.Mutations.Count);
-            Assert.Contains(mutation, piece.Mutations);
+            CollectionAssert.Contains(piece.Mutations, mutation);
         }
 
         [Test]

@@ -24,7 +24,7 @@ namespace MutatingGambit.Tests
 
             // Assert
             Assert.AreEqual(1, board.ArtifactManager.Artifacts.Count);
-            Assert.Contains(artifact, board.ArtifactManager.Artifacts);
+            CollectionAssert.Contains(board.ArtifactManager.Artifacts, artifact);
         }
 
         [Test]

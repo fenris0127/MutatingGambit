@@ -90,7 +90,7 @@ namespace MutatingGambit.Tests
             Assert.AreEqual(PieceColor.Black, piece.Color);
 
             var legalMoves = MoveValidator.GetLegalMoves(board, move.From);
-            Assert.Contains(move.To, legalMoves);
+            CollectionAssert.Contains(legalMoves, move.To);
         }
 
         #endregion
