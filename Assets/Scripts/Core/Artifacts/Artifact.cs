@@ -27,14 +27,14 @@ namespace MutatingGambit.Core.Artifacts
 
         public virtual int Priority
         {
-            get => _priority;
-            set => _priority = value;
+            get { return _priority; }
+            set { _priority = value; }
         }
 
         public bool IsActive
         {
-            get => _isActive;
-            set => _isActive = value;
+            get { return _isActive; }
+            set { _isActive = value; }
         }
 
         /// <summary>
