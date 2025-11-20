@@ -17,12 +17,25 @@ namespace MutatingGambit.Core.Artifacts
     /// </summary>
     public abstract class Artifact
     {
+        private int _priority = 5;
+        private bool _isActive = true;
+
         public abstract string Name { get; }
         public abstract string Description { get; }
         public virtual int Cost => 100;
         public virtual ArtifactTrigger Trigger => ArtifactTrigger.OnMove;
-        public virtual int Priority { get; set; } = 5; // Higher priority executes first
-        public bool IsActive { get; set; } = true;
+
+        public virtual int Priority
+        {
+            get => _priority;
+            set => _priority = value;
+        }
+
+        public bool IsActive
+        {
+            get => _isActive;
+            set => _isActive = value;
+        }
 
         /// <summary>
         /// Applies the artifact's effect
