@@ -53,25 +53,24 @@ namespace MutatingGambit
                 gameStateText.alignment = TextAlignmentOptions.TopLeft;
             }
 
-            // Setup InputField
+            // Setup InputField with Enter key handling
             if (inputField != null)
             {
+                inputField.onSubmit.AddListener(OnInputSubmit);
                 inputField.ActivateInputField();
             }
         }
 
-        void Update()
+        void OnInputSubmit(string input)
         {
-            // Check for Enter key press
-            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-            {
-                if (inputField != null && !string.IsNullOrEmpty(inputField.text))
-                {
-                    ProcessPlayerInput(inputField.text);
-                    inputField.text = "";
-                    inputField.ActivateInputField();
-                }
-            }
+            if (string.IsNullOrEmpty(input))
+                return;
+
+            ProcessPlayerInput(input);
+
+            // Clear and refocus
+            inputField.text = "";
+            inputField.ActivateInputField();
         }
 
         void InitializeGame()
