@@ -28,7 +28,7 @@ namespace MutatingGambit.Tests
         }
 
         [Test]
-        public void Artifact_AppliesTo BothPlayerAndAI()
+        public void Artifact_AppliesToBothPlayerAndAI()
         {
             // Arrange
             var board = new Board(8, 8);
@@ -253,7 +253,7 @@ namespace MutatingGambit.Tests
         }
 
         [Test]
-        public void PromotionPrivilege_PawnDoesNotPromoteBeefore3Captures()
+        public void PromotionPrivilege_PawnDoesNotPromoteBefore3Captures()
         {
             // Arrange
             var board = new Board(8, 8);
