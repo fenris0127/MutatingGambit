@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Movement\RookMoveRule.cs" />
     <Compile Include="Assets\Scripts\Mutations\SplittingKnightMutation.cs" />
+    <Compile Include="Assets\Scripts\Artifacts\Artifact.cs" />
     <Compile Include="Assets\Scripts\Core\Piece.cs" />
     <Compile Include="Assets\Scripts\Artifacts\KingsShadowArtifact.cs" />
     <Compile Include="Assets\Scripts\Victory\IVictoryCondition.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="Assets\Scripts\Movement\MoveRuleFactory.cs" />
     <Compile Include="Assets\Scripts\Rooms\RoomReward.cs" />
     <Compile Include="Assets\Scripts\Core\GameController.cs" />
+    <Compile Include="Assets\Scripts\Meta\MetaProgression.cs" />
     <Compile Include="Assets\Scripts\Victory\KingToPositionCondition.cs" />
     <Compile Include="Assets\Scripts\Core\PieceType.cs" />
     <Compile Include="Assets\Scripts\Artifacts\ArtifactContext.cs" />
