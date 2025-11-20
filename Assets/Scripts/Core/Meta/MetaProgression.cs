@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using MutatingGambit.Core.Mutations;
 using MutatingGambit.Core.Artifacts;
 
@@ -248,7 +249,7 @@ namespace MutatingGambit.Core.Meta
                 BestLayer = _bestLayer
             };
 
-            return System.Text.Json.JsonSerializer.Serialize(saveData);
+            return JsonUtility.ToJson(saveData, prettyPrint: true);
         }
 
         public void Load(string saveDataJson)
@@ -258,7 +259,7 @@ namespace MutatingGambit.Core.Meta
 
             try
             {
-                var saveData = System.Text.Json.JsonSerializer.Deserialize<SaveData>(saveDataJson);
+                var saveData = JsonUtility.FromJson<SaveData>(saveDataJson);
 
                 _currency = saveData.Currency;
                 _unlockedMutations = new HashSet<string>(saveData.UnlockedMutations);
