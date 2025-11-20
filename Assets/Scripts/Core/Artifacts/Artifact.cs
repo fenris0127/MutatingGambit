@@ -59,4 +59,3 @@ namespace MutatingGambit.Core.Artifacts
         }
     }
 }
-
