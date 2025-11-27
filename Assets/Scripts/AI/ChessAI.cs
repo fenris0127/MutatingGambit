@@ -1,105 +1,262 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using MutatingGambit.Core.Movement;
+using UnityEngine;
+using MutatingGambit.Core.ChessEngine;
 
-namespace MutatingGambit.Core.AI
+namespace MutatingGambit.AI
 {
     /// <summary>
-    /// Chess AI that understands mutations and artifacts
+    /// Chess AI using minimax algorithm with alpha-beta pruning.
+    /// Adapts to dynamic rule mutations.
     /// </summary>
-    public class ChessAI
+    public class ChessAI : MonoBehaviour
     {
-        private readonly PieceColor _color;
-        private readonly Difficulty _difficulty;
-        private readonly Random _random;
+        [Header("AI Configuration")]
+        [SerializeField]
+        private AIConfig config;
 
-        // Piece values
-        private const float PAWN_VALUE = 1.0f;
-        private const float KNIGHT_VALUE = 3.0f;
-        private const float BISHOP_VALUE = 3.0f;
-        private const float ROOK_VALUE = 5.0f;
-        private const float QUEEN_VALUE = 9.0f;
-        private const float KING_VALUE = 100.0f;
+        [SerializeField]
+        private Team aiTeam;
 
-        // Positional bonuses
-        private const float CENTER_BONUS = 0.3f;
-        private const float MUTATION_BONUS = 1.0f;
+        private StateEvaluator stateEvaluator;
+        private MoveEvaluator moveEvaluator;
+        private System.Random random;
 
-        public Difficulty CurrentDifficulty => _difficulty;
+        private int nodesEvaluated = 0;
+        private float searchStartTime = 0f;
+        private bool timeExpired = false;
 
-        public ChessAI(PieceColor color, Difficulty difficulty = Difficulty.Normal)
+        /// <summary>
+        /// Gets the AI's team.
+        /// </summary>
+        public Team AITeam => aiTeam;
+
+        /// <summary>
+        /// Gets the AI configuration.
+        /// </summary>
+        public AIConfig Config => config;
+
+        /// <summary>
+        /// Initializes the AI with configuration.
+        /// </summary>
+        public void Initialize(AIConfig aiConfig, Team team, int seed = 0)
         {
-            _color = color;
-            _difficulty = difficulty;
-            _random = new Random();
+            config = aiConfig;
+            aiTeam = team;
+            random = seed == 0 ? new System.Random() : new System.Random(seed);
+
+            stateEvaluator = new StateEvaluator(config, team, seed);
+            moveEvaluator = new MoveEvaluator(config, stateEvaluator, team);
+
+            Debug.Log($"ChessAI initialized: Team={team}, Depth={config.SearchDepth}, Time={config.MaxTimePerMove}ms");
+        }
+
+        private void Awake()
+        {
+            if (config != null && stateEvaluator == null)
+            {
+                Initialize(config, aiTeam);
+            }
         }
 
         /// <summary>
-        /// Selects the best move for the current board state
+        /// Determines the best move for the AI on the given board.
         /// </summary>
-        public AIMove SelectBestMove(Board board, int timeLimitMs = 5000)
+        public Move MakeMove(Board board)
         {
-            var allMoves = GetAllPossibleMoves(board);
+            if (board == null)
+            {
+                Debug.LogError("ChessAI.MakeMove called with null board!");
+                return default;
+            }
+
+            nodesEvaluated = 0;
+            searchStartTime = Time.realtimeSinceStartup;
+            timeExpired = false;
+
+            Move bestMove;
+
+            if (config.UseIterativeDeepening)
+            {
+                bestMove = IterativeDeepeningSearch(board);
+            }
+            else
+            {
+                bestMove = DepthLimitedSearch(board, config.SearchDepth);
+            }
+
+            float elapsedTime = (Time.realtimeSinceStartup - searchStartTime) * 1000f;
+            Debug.Log($"AI move: {bestMove} | Nodes: {nodesEvaluated} | Time: {elapsedTime:F1}ms");
+
+            return bestMove;
+        }
+
+        /// <summary>
+        /// Iterative deepening search - searches incrementally deeper until time runs out.
+        /// </summary>
+        private Move IterativeDeepeningSearch(Board board)
+        {
+            Move bestMove = default;
+            int maxDepth = config.SearchDepth;
+
+            for (int depth = 1; depth <= maxDepth; depth++)
+            {
+                if (IsTimeExpired())
+                {
+                    Debug.Log($"Iterative deepening stopped at depth {depth - 1}");
+                    break;
+                }
+
+                Move currentBestMove = DepthLimitedSearch(board, depth);
+
+                if (!IsTimeExpired())
+                {
+                    bestMove = currentBestMove;
+                }
+            }
+
+            return bestMove;
+        }
+
+        /// <summary>
+        /// Performs a depth-limited minimax search.
+        /// </summary>
+        private Move DepthLimitedSearch(Board board, int depth)
+        {
+            List<Move> allMoves = GetAllMoves(board, aiTeam);
 
             if (allMoves.Count == 0)
             {
-                return null;
+                Debug.LogWarning("No valid moves available for AI!");
+                return default;
             }
 
-            // Easy difficulty: random move with slight preference for captures
-            if (_difficulty == Difficulty.Easy)
-            {
-                var captureMoves = allMoves.Where(m => board.GetPieceAt(m.To) != null).ToList();
-                if (captureMoves.Count > 0 && _random.Next(100) < 70)
-                {
-                    return captureMoves[_random.Next(captureMoves.Count)];
-                }
-                return allMoves[_random.Next(allMoves.Count)];
-            }
+            Move bestMove = allMoves[0];
+            float bestScore = float.MinValue;
 
-            // Evaluate all moves
+            // Evaluate each move
             foreach (var move in allMoves)
             {
-                move.Evaluation = EvaluateMove(board, move);
-            }
-
-            // Add some randomness for non-master difficulties
-            if (_difficulty != Difficulty.Master)
-            {
-                float randomness = _difficulty == Difficulty.Normal ? 0.5f : 0.2f;
-                foreach (var move in allMoves)
+                if (IsTimeExpired())
                 {
-                    move.Evaluation += (float)(_random.NextDouble() * randomness - randomness / 2);
+                    break;
+                }
+
+                Board clonedBoard = board.Clone();
+                clonedBoard.MovePiece(move.From, move.To);
+
+                // Run minimax from opponent's perspective
+                float score = Minimax(clonedBoard, depth - 1, float.MinValue, float.MaxValue, false);
+
+                // Cleanup cloned board
+                Destroy(clonedBoard.gameObject);
+
+                // Track best move
+                if (score > bestScore || (Mathf.Approximately(score, bestScore) && ShouldChooseRandomly()))
+                {
+                    bestScore = score;
+                    bestMove = move;
                 }
             }
 
-            // Return best move
-            return allMoves.OrderByDescending(m => m.Evaluation).First();
+            bestMove.Score = bestScore;
+            return bestMove;
         }
 
         /// <summary>
-        /// Gets all possible moves for the AI's color
+        /// Minimax algorithm with alpha-beta pruning.
         /// </summary>
-        public List<AIMove> GetAllPossibleMoves(Board board)
+        private float Minimax(Board board, int depth, float alpha, float beta, bool maximizingPlayer)
         {
-            var moves = new List<AIMove>();
+            nodesEvaluated++;
 
-            for (int x = 0; x < board.Width; x++)
+            // Time limit check
+            if (IsTimeExpired())
             {
-                for (int y = 0; y < board.Height; y++)
-                {
-                    var position = PositionCache.Get(x, y);
-                    var piece = board.GetPieceAt(position);
+                return stateEvaluator.EvaluateBoard(board);
+            }
 
-                    if (piece != null && piece.Color == _color && !piece.IsBroken)
+            // Terminal node (depth 0 or game over)
+            if (depth == 0 || IsTerminalState(board))
+            {
+                return stateEvaluator.EvaluateBoard(board);
+            }
+
+            if (maximizingPlayer)
+            {
+                // AI's turn (maximize score)
+                float maxEval = float.MinValue;
+                List<Move> moves = GetAllMoves(board, aiTeam);
+
+                foreach (var move in moves)
+                {
+                    Board clonedBoard = board.Clone();
+                    clonedBoard.MovePiece(move.From, move.To);
+
+                    float eval = Minimax(clonedBoard, depth - 1, alpha, beta, false);
+
+                    Destroy(clonedBoard.gameObject);
+
+                    maxEval = Mathf.Max(maxEval, eval);
+                    alpha = Mathf.Max(alpha, eval);
+
+                    // Alpha-beta pruning
+                    if (beta <= alpha)
                     {
-                        var pieceMoves = GetPossibleMovesForPiece(board, position);
-                        foreach (var targetPos in pieceMoves)
-                        {
-                            moves.Add(new AIMove(position, targetPos));
-                        }
+                        break;
                     }
+                }
+
+                return maxEval;
+            }
+            else
+            {
+                // Opponent's turn (minimize score)
+                float minEval = float.MaxValue;
+                Team opponentTeam = aiTeam == Team.White ? Team.Black : Team.White;
+                List<Move> moves = GetAllMoves(board, opponentTeam);
+
+                foreach (var move in moves)
+                {
+                    Board clonedBoard = board.Clone();
+                    clonedBoard.MovePiece(move.From, move.To);
+
+                    float eval = Minimax(clonedBoard, depth - 1, alpha, beta, true);
+
+                    Destroy(clonedBoard.gameObject);
+
+                    minEval = Mathf.Min(minEval, eval);
+                    beta = Mathf.Min(beta, eval);
+
+                    // Alpha-beta pruning
+                    if (beta <= alpha)
+                    {
+                        break;
+                    }
+                }
+
+                return minEval;
+            }
+        }
+
+        /// <summary>
+        /// Gets all valid moves for a team on the board.
+        /// </summary>
+        private List<Move> GetAllMoves(Board board, Team team)
+        {
+            var moves = new List<Move>();
+            var pieces = board.GetPiecesByTeam(team);
+
+            foreach (var piece in pieces)
+            {
+                if (piece == null) continue;
+
+                var validMoves = MoveValidator.GetValidMoves(board, piece.Position);
+
+                foreach (var targetPos in validMoves)
+                {
+                    var capturedPiece = board.GetPiece(targetPos);
+                    moves.Add(new Move(piece.Position, targetPos, piece, capturedPiece));
                 }
             }
 
@@ -107,108 +264,66 @@ namespace MutatingGambit.Core.AI
         }
 
         /// <summary>
-        /// Gets possible moves for a specific piece (respects mutations)
+        /// Checks if the board is in a terminal state (game over).
         /// </summary>
-        public List<Position> GetPossibleMovesForPiece(Board board, Position position)
+        private bool IsTerminalState(Board board)
         {
-            return MoveValidator.GetLegalMoves(board, position);
+            // Check if either king is captured
+            var aiKing = FindKing(board, aiTeam);
+            Team opponentTeam = aiTeam == Team.White ? Team.Black : Team.White;
+            var opponentKing = FindKing(board, opponentTeam);
+
+            if (aiKing == null || opponentKing == null)
+            {
+                return true; // King captured = game over
+            }
+
+            // Check for stalemate (no valid moves)
+            var aiMoves = GetAllMoves(board, aiTeam);
+            var opponentMoves = GetAllMoves(board, opponentTeam);
+
+            return aiMoves.Count == 0 || opponentMoves.Count == 0;
         }
 
         /// <summary>
-        /// Evaluates the current board state
+        /// Finds the king of a specific team.
         /// </summary>
-        public float EvaluateBoard(Board board)
+        private Piece FindKing(Board board, Team team)
         {
-            float evaluation = 0;
-
-            for (int x = 0; x < board.Width; x++)
+            var pieces = board.GetPiecesByTeam(team);
+            foreach (var piece in pieces)
             {
-                for (int y = 0; y < board.Height; y++)
+                if (piece != null && piece.Type == PieceType.King)
                 {
-                    var position = PositionCache.Get(x, y);
-                    var piece = board.GetPieceAt(position);
-
-                    if (piece != null && !piece.IsBroken)
-                    {
-                        float pieceValue = EvaluatePiece(piece, position);
-
-                        // Add to evaluation based on color
-                        if (piece.Color == _color)
-                        {
-                            evaluation += pieceValue;
-                        }
-                        else
-                        {
-                            evaluation -= pieceValue;
-                        }
-                    }
+                    return piece;
                 }
             }
-
-            return evaluation;
+            return null;
         }
 
         /// <summary>
-        /// Evaluates a specific piece's value
+        /// Checks if the time limit has been exceeded.
         /// </summary>
-        public float EvaluatePiece(Piece piece, Position position)
+        private bool IsTimeExpired()
         {
-            float value = GetBasePieceValue(piece.Type);
+            if (timeExpired) return true;
 
-            // Positional bonus for center control
-            float centerDistance = Math.Abs(position.X - 3.5f) + Math.Abs(position.Y - 3.5f);
-            value += (7 - centerDistance) * CENTER_BONUS * 0.1f;
-
-            // Mutation bonus
-            if (piece.Mutations.Count > 0)
+            float elapsed = (Time.realtimeSinceStartup - searchStartTime) * 1000f;
+            if (elapsed >= config.MaxTimePerMove)
             {
-                value += piece.Mutations.Count * MUTATION_BONUS;
+                timeExpired = true;
+                return true;
             }
 
-            // HP factor
-            if (piece.HP < piece.MaxHP)
-            {
-                value *= (float)piece.HP / piece.MaxHP;
-            }
-
-            return value;
+            return false;
         }
 
-        private float GetBasePieceValue(PieceType type)
+        /// <summary>
+        /// Randomly decides whether to choose a move with equal evaluation.
+        /// </summary>
+        private bool ShouldChooseRandomly()
         {
-            switch (type)
-            {
-                case PieceType.Pawn: return PAWN_VALUE;
-                case PieceType.Knight: return KNIGHT_VALUE;
-                case PieceType.Bishop: return BISHOP_VALUE;
-                case PieceType.Rook: return ROOK_VALUE;
-                case PieceType.Queen: return QUEEN_VALUE;
-                case PieceType.King: return KING_VALUE;
-                default: return 0;
-            }
-        }
-
-        private float EvaluateMove(Board board, AIMove move)
-        {
-            // Simulate the move
-            var simulatedBoard = board.Clone();
-            var piece = simulatedBoard.GetPieceAt(move.From);
-            var capturedPiece = simulatedBoard.GetPieceAt(move.To);
-
-            // Make the move on simulated board
-            simulatedBoard.PlacePiece(null, move.From);
-            simulatedBoard.PlacePiece(piece, move.To);
-
-            // Evaluate resulting position
-            float evaluation = EvaluateBoard(simulatedBoard);
-
-            // Bonus for captures
-            if (capturedPiece != null)
-            {
-                evaluation += GetBasePieceValue(capturedPiece.Type) * 0.5f;
-            }
-
-            return evaluation;
+            return config.RandomnessFactor > 0 && random.NextDouble() < config.RandomnessFactor;
         }
     }
 }
