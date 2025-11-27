@@ -20,6 +20,14 @@ namespace MutatingGambit.Systems.Mutations
         public List<Mutation> AllMutations => allMutations;
 
         /// <summary>
+        /// Gets a mutation by its name.
+        /// </summary>
+        public Mutation GetMutationByName(string name)
+        {
+            return allMutations.FirstOrDefault(m => m.MutationName == name);
+        }
+
+        /// <summary>
         /// Gets mutations by rarity.
         /// </summary>
         public List<Mutation> GetMutationsByRarity(MutationRarity rarity)

@@ -173,6 +173,64 @@ namespace MutatingGambit.Systems.Dungeon
         }
 
         /// <summary>
+        /// Loads a dungeon run from save data.
+        /// </summary>
+        public void LoadRun(Systems.SaveLoad.GameSaveData data)
+        {
+            if (data == null) return;
+
+            // Restore player state
+            if (playerState == null) playerState = new PlayerState();
+            
+            // We need references to libraries to resolve IDs
+            var mutationLib = Resources.Load<MutatingGambit.Systems.Mutations.MutationLibrary>("MutationLibrary");
+            var artifactLib = Resources.Load<MutatingGambit.Systems.Artifacts.ArtifactLibrary>("ArtifactLibrary");
+            
+            playerState.LoadFromSaveData(data.PlayerData, mutationLib, artifactLib);
+            playerState.Currency = data.Gold;
+            
+            // Restore artifacts
+            if (data.ActiveArtifactNames != null)
+            {
+                foreach (var artName in data.ActiveArtifactNames)
+                {
+                    var artifact = artifactLib.GetArtifactByName(artName);
+                    if (artifact != null)
+                    {
+                        playerState.AddArtifact(artifact);
+                    }
+                }
+            }
+
+            // Generate/Restore Map
+            // For MVP, we might regenerate map or just place player at correct floor/room.
+            // Ideally we save the map seed.
+            if (mapGenerator != null)
+            {
+                // TODO: Use saved seed
+                currentDungeonMap = mapGenerator.GenerateMap(); 
+                
+                // Set current node
+                // This is tricky without saving the whole graph structure or deterministic generation.
+                // For now, let's just put them at the start of the floor or try to find the room index.
+                if (currentDungeonMap != null && currentDungeonMap.Nodes.Count > data.CurrentRoomIndex)
+                {
+                    currentRoomNode = currentDungeonMap.Nodes[data.CurrentRoomIndex];
+                }
+            }
+
+            // Show map
+            if (dungeonMapUI != null && currentDungeonMap != null)
+            {
+                dungeonMapUI.ShowMap(currentDungeonMap);
+                // If we are in a room, we might want to enter it immediately or show map.
+                // Usually load -> show map is safer.
+            }
+            
+            Debug.Log("Dungeon run loaded!");
+        }
+
+        /// <summary>
         /// Called when a node is selected from the dungeon map UI.
         /// </summary>
         private void OnNodeSelected(RoomNode node)
@@ -459,26 +517,58 @@ namespace MutatingGambit.Systems.Dungeon
         }
 
         /// <summary>
-        /// Called when a room is lost.
+        /// Handles dungeon completion (victory).
+        /// </summary>
+        private void HandleDungeonComplete()
+        {
+            Debug.Log("Dungeon Completed!");
+            OnDungeonCompleted?.Invoke();
+            
+            // Record run
+            if (GlobalDataManager.Instance != null)
+            {
+                GlobalDataManager.Instance.RecordRun(true, playerState);
+            }
+
+            // Show victory screen
+            var gameOverScreen = FindObjectOfType<GameOverScreen>();
+            if (gameOverScreen != null)
+            {
+                gameOverScreen.ShowDungeonComplete(playerState.Currency, playerState.RoomsCleared);
+            }
+            
+            // Clear save file
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.DeleteSaveFile();
+            }
+        }
+
+        /// <summary>
+        /// Handles room defeat (game over).
         /// </summary>
         private void OnRoomDefeat()
         {
-            Debug.Log("Room defeated - dungeon failed");
+            Debug.Log("Room Failed - Game Over");
             OnDungeonFailed?.Invoke();
 
-            if (gameManager != null)
+            // Record run
+            if (GlobalDataManager.Instance != null)
             {
-                var gameOverScreen = FindObjectOfType<GameOverScreen>();
-                if (gameOverScreen != null)
-                {
-                    GameStats stats = new GameStats
-                    {
-                        RoomsCleared = playerState.RoomsCleared,
-                        ArtifactsCollected = playerState.CollectedArtifacts.Count,
-                        PiecesLost = playerState.BrokenPieces.Count
-                    };
-                    gameOverScreen.ShowDefeat("Your run has ended.", stats);
-                }
+                GlobalDataManager.Instance.RecordRun(false, playerState);
+            }
+
+            // Show defeat screen
+            var gameOverScreen = FindObjectOfType<GameOverScreen>();
+            if (gameOverScreen != null)
+            {
+                gameOverScreen.ShowDefeat();
+            }
+            
+            // Clear save file
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.DeleteSaveFile();
             }
         }
 

@@ -214,6 +214,13 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 8.13 Add particle effects for mutations and artifacts (System implemented)
   - [x] 8.14 Final integration test and bug fixing (Tests created)
   - [x] 8.15 Implement Tutorial & Onboarding (System implemented)
-  - [ ] 8.16 Implement Save/Load System (New PRD Item)
-  - [ ] 8.17 Implement Codex & History (New PRD Item)
+  - [x] Implement Save/Load System (Task 8.16) <!-- id: 4 -->
+    - [x] Create SaveManager and SaveData structures
+    - [x] Implement serialization for PlayerState and DungeonState
+    - [x] Add Save/Load buttons to UI
+    - [x] Integrate with DungeonManager
+  - [x] Implement Codex & History (Task 8.17) <!-- id: 5 -->
+    - [x] Create GlobalDataManager and RunRecord
+    - [x] Implement CodexUI and RunHistoryUI
+    - [x] Integrate with Game Over and Acquisition events
   - [ ] 8.18 Build standalone executable and test

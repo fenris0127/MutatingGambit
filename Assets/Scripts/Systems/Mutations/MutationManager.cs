@@ -125,6 +125,12 @@ namespace MutatingGambit.Systems.Mutations
             // Fire event
             OnMutationApplied?.Invoke(piece, mutation);
 
+            // Unlock in Codex
+            if (GlobalDataManager.Instance != null)
+            {
+                GlobalDataManager.Instance.UnlockMutation(mutation.MutationName);
+            }
+
             Debug.Log($"Applied mutation '{mutation.MutationName}' to {piece.Type} at {piece.Position}");
         }
 

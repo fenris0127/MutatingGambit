@@ -1,8 +1,24 @@
 using UnityEngine;
+using System.Collections.Generic;
 using MutatingGambit.Core.ChessEngine;
 
 namespace MutatingGambit.Systems.Artifacts
 {
+    /// <summary>
+    /// Tags for categorizing artifacts and detecting synergies.
+    /// </summary>
+    public enum ArtifactTag
+    {
+        Global,      // Affects entire board
+        Movement,    // Modifies movement
+        Combat,      // Battle effects
+        Economic,    // Resource/currency
+        Defensive,   // Protection
+        Aggressive,  // Offensive power
+        Chaos,       // Random/unpredictable
+        Temporal     // Time/turn effects
+    }
+
     /// <summary>
     /// Defines when an artifact's effect should trigger.
     /// </summary>
@@ -80,6 +96,18 @@ namespace MutatingGambit.Systems.Artifacts
         [Tooltip("Rarity tier (higher = more powerful/expensive).")]
         private ArtifactRarity rarity = ArtifactRarity.Common;
 
+        [SerializeField]
+        [Tooltip("Tags for this artifact.")]
+        private ArtifactTag[] tags = new ArtifactTag[0];
+
+        [SerializeField]
+        [Tooltip("Can this artifact be stacked with itself?")]
+        private bool canStack = false;
+
+        [SerializeField]
+        [Tooltip("Artifacts that synergize with this one.")]
+        private Artifact[] synergyArtifacts;
+
         /// <summary>
         /// Gets the name of this artifact.
         /// </summary>
@@ -109,6 +137,21 @@ namespace MutatingGambit.Systems.Artifacts
         /// Gets the rarity tier of this artifact.
         /// </summary>
         public ArtifactRarity Rarity => rarity;
+
+        /// <summary>
+        /// Gets the tags of this artifact.
+        /// </summary>
+        public ArtifactTag[] Tags => tags;
+
+        /// <summary>
+        /// Can this artifact stack with itself?
+        /// </summary>
+        public bool CanStack => canStack;
+
+        /// <summary>
+        /// Gets artifacts that synergize with this one.
+        /// </summary>
+        public Artifact[] SynergyArtifacts => synergyArtifacts;
 
         /// <summary>
         /// Called when the artifact is first acquired.

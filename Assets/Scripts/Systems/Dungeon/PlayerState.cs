@@ -295,6 +295,41 @@ namespace MutatingGambit.Systems.Dungeon
         }
 
         /// <summary>
+        /// Loads player state from save data.
+        /// </summary>
+        public void LoadFromSaveData(Systems.SaveLoad.PlayerSaveData data, MutationLibrary mutationLib, ArtifactLibrary artifactLib)
+        {
+            if (data == null) return;
+
+            pieces.Clear();
+            collectedArtifacts.Clear();
+            // brokenPieces.Clear(); // TODO: Add broken pieces to save data
+
+            // Restore pieces
+            foreach (var pieceData in data.Pieces)
+            {
+                var stateData = new PieceStateData(pieceData.Type, Team.White, pieceData.Position); // Assuming player is White
+                
+                // Restore mutations
+                if (pieceData.MutationNames != null)
+                {
+                    foreach (var mutationName in pieceData.MutationNames)
+                    {
+                        var mutation = mutationLib.GetMutationByName(mutationName);
+                        if (mutation != null)
+                        {
+                            stateData.mutations.Add(mutation);
+                        }
+                    }
+                }
+                pieces.Add(stateData);
+            }
+
+            // Restore artifacts (passed in separately or handled by SaveManager)
+            // If we add artifact names to PlayerSaveData, we would load them here.
+        }
+
+        /// <summary>
         /// Resets the player state (for new run).
         /// </summary>
         public void Reset()
