@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(if not exist \"D:\\New Unity Project\\MutatingGambit\\docs\" mkdir \"D:\\New Unity Project\\MutatingGambit\\docs\")",
+      "Bash(mkdir:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
