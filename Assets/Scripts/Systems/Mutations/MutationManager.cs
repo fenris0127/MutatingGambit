@@ -35,6 +35,18 @@ namespace MutatingGambit.Systems.Mutations
         // Tracks which mutations are applied to which pieces
         private Dictionary<Piece, List<Mutation>> pieceMutations = new Dictionary<Piece, List<Mutation>>();
 
+        /// <summary>
+        /// Event fired when a mutation is applied to a piece.
+        /// Args: Piece, Mutation
+        /// </summary>
+        public event System.Action<Piece, Mutation> OnMutationApplied;
+
+        /// <summary>
+        /// Event fired when a mutation is removed from a piece.
+        /// Args: Piece, Mutation
+        /// </summary>
+        public event System.Action<Piece, Mutation> OnMutationRemoved;
+
         private void Awake()
         {
             if (instance != null && instance != this)
@@ -78,11 +90,16 @@ namespace MutatingGambit.Systems.Mutations
                 return;
             }
 
-            // Apply the mutation
+            // Apply the mutation to the piece
             mutation.ApplyToPiece(piece);
+
+            // Add to tracking
             pieceMutations[piece].Add(mutation);
 
-            Debug.Log($"Applied mutation '{mutation.MutationName}' to {piece}");
+            // Fire event
+            OnMutationApplied?.Invoke(piece, mutation);
+
+            Debug.Log($"Applied mutation '{mutation.MutationName}' to {piece.Type} at {piece.Position}");
         }
 
         /// <summary>
@@ -104,6 +121,9 @@ namespace MutatingGambit.Systems.Mutations
             {
                 mutation.RemoveFromPiece(piece);
                 pieceMutations[piece].Remove(mutation);
+
+                // Fire event
+                OnMutationRemoved?.Invoke(piece, mutation);
 
                 Debug.Log($"Removed mutation '{mutation.MutationName}' from {piece}");
             }
