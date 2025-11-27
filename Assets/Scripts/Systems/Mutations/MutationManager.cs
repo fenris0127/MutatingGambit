@@ -35,6 +35,9 @@ namespace MutatingGambit.Systems.Mutations
         // Tracks which mutations are applied to which pieces
         private Dictionary<Piece, List<Mutation>> pieceMutations = new Dictionary<Piece, List<Mutation>>();
 
+        // Tracks stack counts for stackable mutations
+        private Dictionary<Piece, Dictionary<Mutation, int>> mutationStacks = new Dictionary<Piece, Dictionary<Mutation, int>>();
+
         /// <summary>
         /// Event fired when a mutation is applied to a piece.
         /// Args: Piece, Mutation
@@ -81,12 +84,34 @@ namespace MutatingGambit.Systems.Mutations
             if (!pieceMutations.ContainsKey(piece))
             {
                 pieceMutations[piece] = new List<Mutation>();
+                mutationStacks[piece] = new Dictionary<Mutation, int>();
             }
 
             // Check if mutation is already applied
             if (pieceMutations[piece].Contains(mutation))
             {
-                Debug.LogWarning($"Mutation '{mutation.MutationName}' is already applied to this piece.");
+                // Handle stacking
+                if (mutation.CanStack)
+                {
+                    int currentStacks = mutationStacks[piece][mutation];
+                    if (currentStacks < mutation.MaxStacks)
+                    {
+                        mutationStacks[piece][mutation]++;
+                        Debug.Log($"Stacked '{mutation.MutationName}' on {piece.Type} (Stack: {mutationStacks[piece][mutation]})");
+                        
+                        // Reapply for stack bonus
+                        mutation.ApplyToPiece(piece);
+                        OnMutationApplied?.Invoke(piece, mutation);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Mutation '{mutation.MutationName}' is already at max stacks ({mutation.MaxStacks}).");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"Mutation '{mutation.MutationName}' is already applied and cannot stack.");
+                }
                 return;
             }
 
@@ -95,6 +120,7 @@ namespace MutatingGambit.Systems.Mutations
 
             // Add to tracking
             pieceMutations[piece].Add(mutation);
+            mutationStacks[piece][mutation] = 1;
 
             // Fire event
             OnMutationApplied?.Invoke(piece, mutation);
