@@ -46,11 +46,9 @@ namespace MutatingGambit.Systems.SaveLoad
             var dungeonManager = DungeonManager.Instance;
             if (dungeonManager != null)
             {
-                // TODO: Add CurrentFloor and CurrentRoomIndex properties to DungeonManager
-                // data.CurrentFloor = dungeonManager.CurrentFloor;
-                // data.CurrentRoomIndex = dungeonManager.CurrentRoomIndex;
-                data.CurrentFloor = 0;
-                data.CurrentRoomIndex = 0;
+                // Save Dungeon State
+                data.CurrentFloor = dungeonManager.CurrentFloor;
+                data.CurrentRoomIndex = dungeonManager.CurrentRoomIndex;
                 // Seed saving would go here if implemented
             }
 
@@ -90,8 +88,37 @@ namespace MutatingGambit.Systems.SaveLoad
                     data.PlayerData.Pieces.Add(pieceData);
                 }
                 
-                // TODO: Also save dead pieces if they are relevant (e.g. for resurrection)
-                // This requires PlayerState to track dead pieces persistently.
+                // Save broken pieces
+                var repairSystem = FindFirstObjectByType<Systems.PieceManagement.RepairSystem>();
+                if (repairSystem != null && repairSystem.BrokenPieces != null)
+                {
+                    data.PlayerData.BrokenPieces = new List<PieceSaveData>();
+                    foreach (var brokenPiece in repairSystem.BrokenPieces)
+                    {
+                        if (brokenPiece.Piece != null)
+                        {
+                            var pieceData = new PieceSaveData
+                            {
+                                Type = brokenPiece.Piece.Type,
+                                Position = brokenPiece.Piece.Position,
+                                IsAlive = false,
+                                MutationNames = new List<string>()
+                            };
+                            
+                            // Save mutations for broken pieces too
+                            if (MutationManager.Instance != null)
+                            {
+                                var mutations = MutationManager.Instance.GetMutations(brokenPiece.Piece);
+                                foreach (var m in mutations)
+                                {
+                                    pieceData.MutationNames.Add(m.MutationName);
+                                }
+                            }
+                            
+                            data.PlayerData.BrokenPieces.Add(pieceData);
+                        }
+                    }
+                }
             }
 
             // 3. Save Artifacts
@@ -99,9 +126,10 @@ namespace MutatingGambit.Systems.SaveLoad
             if (artifactManager != null)
             {
                 data.ActiveArtifactNames = new List<string>();
-                // TODO: Add GetActiveArtifacts method to ArtifactManager
-                // var artifacts = artifactManager.GetActiveArtifacts();
-                // foreach(var art in artifacts) data.ActiveArtifactNames.Add(art.ArtifactName);
+                foreach(var art in artifactManager.ActiveArtifacts)
+                {
+                    data.ActiveArtifactNames.Add(art.ArtifactName);
+                }
             }
 
             // Serialize and write to file
@@ -169,21 +197,20 @@ namespace MutatingGambit.Systems.SaveLoad
                     if (pieceData.IsAlive)
                     {
                         // Create piece
-                        // Need a way to spawn piece by type. Board usually has a method or we use a factory.
-                        // For MVP, we might need to instantiate prefabs.
-                        // Assuming Board has a SpawnPiece method or similar.
-                        // board.SpawnPiece(pieceData.Type, Team.White, pieceData.Position); 
-                        
-                        // Since Board.SpawnPiece might not exist or be public, let's assume we have a way.
-                        // If not, we need to implement it.
-                        // Let's check Board.cs later.
+                        // Use Board's SpawnPiece method
+                        var piece = board.SpawnPiece(pieceData.Type, Team.White, pieceData.Position);
                         
                         // Apply mutations
-                        // var piece = board.GetPiece(pieceData.Position);
-                        // foreach (var mutName in pieceData.MutationNames) {
-                        //    var mutation = mutationLibrary.GetMutationByName(mutName);
-                        //    MutationManager.Instance.ApplyMutation(piece, mutation);
-                        // }
+                        if (piece != null && pieceData.MutationNames != null)
+                        {
+                           foreach (var mutName in pieceData.MutationNames) {
+                               var mutation = mutationLibrary.GetMutationByName(mutName);
+                               if (mutation != null)
+                               {
+                                   MutationManager.Instance.ApplyMutation(piece, mutation);
+                               }
+                           }
+                        }
                     }
                 }
             }
@@ -191,6 +218,7 @@ namespace MutatingGambit.Systems.SaveLoad
             // 3. Restore Dungeon State
             if (DungeonManager.Instance != null)
             {
+                // DungeonManager handles its own restoration via LoadRun, but if we needed to set state here:
                 // DungeonManager.Instance.SetState(data.CurrentFloor, data.CurrentRoomIndex);
             }
         }

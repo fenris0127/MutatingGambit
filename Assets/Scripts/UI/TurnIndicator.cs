@@ -120,15 +120,38 @@ namespace MutatingGambit.UI
         /// </summary>
         public void AnimateTurnChange()
         {
-            // Simple pulse animation (requires LeanTween library)
-            // TODO: Implement with Unity's built-in animation system or DOTween
             if (backgroundImage != null)
             {
-                // Placeholder: Simple color flash
-                Color originalColor = backgroundImage.color;
-                backgroundImage.color = Color.white;
-                // Would use StartCoroutine to fade back to original color
+                StartCoroutine(PulseRoutine());
             }
+        }
+
+        private System.Collections.IEnumerator PulseRoutine()
+        {
+            Color originalColor = backgroundImage.color;
+            Color flashColor = Color.white;
+            float duration = 0.5f;
+            float halfDuration = duration / 2f;
+            float elapsed = 0f;
+
+            // Flash to white
+            while (elapsed < halfDuration)
+            {
+                elapsed += Time.deltaTime;
+                backgroundImage.color = Color.Lerp(originalColor, flashColor, elapsed / halfDuration);
+                yield return null;
+            }
+
+            elapsed = 0f;
+            // Fade back
+            while (elapsed < halfDuration)
+            {
+                elapsed += Time.deltaTime;
+                backgroundImage.color = Color.Lerp(flashColor, originalColor, elapsed / halfDuration);
+                yield return null;
+            }
+
+            backgroundImage.color = originalColor;
         }
     }
 }

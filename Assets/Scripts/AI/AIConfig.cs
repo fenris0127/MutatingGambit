@@ -157,5 +157,45 @@ namespace MutatingGambit.AI
         {
             return $"AIConfig: {configName} (Depth: {searchDepth})";
         }
+
+#if UNITY_INCLUDE_TESTS
+        /// <summary>
+        /// Creates an AIConfig instance for testing with custom values.
+        /// Avoids fragile reflection-based initialization.
+        /// </summary>
+        public static AIConfig CreateForTesting(
+            int searchDepth = 3,
+            int maxTimePerMove = 1000,
+            bool useIterativeDeepening = false,
+            float materialWeight = 1.0f,
+            float positionalWeight = 0.3f,
+            float kingSafetyWeight = 0.5f,
+            float mobilityWeight = 0.2f,
+            float randomnessFactor = 0.1f,
+            float pawnValue = 1.0f,
+            float knightValue = 3.0f,
+            float bishopValue = 3.0f,
+            float rookValue = 5.0f,
+            float queenValue = 9.0f,
+            float kingValue = 100.0f)
+        {
+            var config = CreateInstance<AIConfig>();
+            config.searchDepth = searchDepth;
+            config.maxTimePerMove = maxTimePerMove;
+            config.useIterativeDeepening = useIterativeDeepening;
+            config.materialWeight = materialWeight;
+            config.positionalWeight = positionalWeight;
+            config.kingSafetyWeight = kingSafetyWeight;
+            config.mobilityWeight = mobilityWeight;
+            config.randomnessFactor = randomnessFactor;
+            config.pawnValue = pawnValue;
+            config.knightValue = knightValue;
+            config.bishopValue = bishopValue;
+            config.rookValue = rookValue;
+            config.queenValue = queenValue;
+            config.kingValue = kingValue;
+            return config;
+        }
+#endif
     }
 }

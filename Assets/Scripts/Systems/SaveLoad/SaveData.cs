@@ -27,6 +27,7 @@ namespace MutatingGambit.Systems.SaveLoad
     public class PlayerSaveData
     {
         public List<PieceSaveData> Pieces;
+        public List<PieceSaveData> BrokenPieces;
     }
 
     /// <summary>

@@ -24,6 +24,10 @@ namespace MutatingGambit.Core.ChessEngine
         [SerializeField]
         private ArtifactManager artifactManager;
 
+        [Header("Prefabs")]
+        [SerializeField]
+        private GameObject piecePrefab;
+
         private Piece[,] pieces;
         private List<Piece> allPieces = new List<Piece>();
 
@@ -135,6 +139,35 @@ namespace MutatingGambit.Core.ChessEngine
             {
                 obstacles[position.x, position.y] = isObstacle;
             }
+        }
+
+        /// <summary>
+        /// Spawns a new piece on the board.
+        /// </summary>
+        public Piece SpawnPiece(PieceType type, Team team, Vector2Int position)
+        {
+            GameObject pieceObject;
+
+            if (piecePrefab != null)
+            {
+                pieceObject = Instantiate(piecePrefab);
+                pieceObject.name = $"{team}_{type}";
+            }
+            else
+            {
+                pieceObject = new GameObject($"{team}_{type}");
+            }
+
+            Piece piece = pieceObject.GetComponent<Piece>();
+            if (piece == null)
+            {
+                piece = pieceObject.AddComponent<Piece>();
+            }
+
+            piece.Initialize(type, team, position);
+            PlacePiece(piece, position);
+
+            return piece;
         }
 
         /// <summary>

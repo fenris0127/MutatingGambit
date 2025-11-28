@@ -68,16 +68,30 @@ namespace MutatingGambit.Systems.Mutations
         /// </summary>
         public void ApplyMutation(Piece piece, Mutation mutation)
         {
-            if (piece == null || mutation == null)
+            if (piece == null)
             {
-                Debug.LogError("Cannot apply null piece or mutation.");
+                Debug.LogError("Cannot apply mutation: piece parameter is null");
+                return;
+            }
+            
+            if (mutation == null)
+            {
+                Debug.LogError($"Cannot apply mutation to {piece.Type} at {piece.Position}: mutation parameter is null");
                 return;
             }
 
             // Check compatibility
             if (!mutation.IsCompatibleWith(piece.Type))
             {
-                Debug.LogWarning($"Mutation '{mutation.MutationName}' is not compatible with {piece.Type}.");
+                // Build compatible types string for better error message
+                var compatibleTypes = mutation.Tags != null && mutation.Tags.Length > 0 
+                    ? string.Join(", ", mutation.Tags)
+                    : "No specific compatibility info available";
+                
+                Debug.LogWarning(
+                    $"Mutation '{mutation.MutationName}' is not compatible with {piece.Type} at {piece.Position}. " +
+                    $"This mutation may be designed for specific piece types. Tags: [{compatibleTypes}]"
+                );
                 return;
             }
 
@@ -218,7 +232,7 @@ namespace MutatingGambit.Systems.Mutations
         /// <summary>
         /// Notifies all mutations on a piece that it captured an enemy.
         /// </summary>
-        public void NotifyCapture(Piece attacker, Piece captured, Core.ChessEngine.Board board)
+        public void NotifyCapture(Piece attacker, Piece captured, Vector2Int from, Vector2Int to, Core.ChessEngine.Board board)
         {
             if (attacker == null || !pieceMutations.ContainsKey(attacker))
             {
@@ -227,7 +241,7 @@ namespace MutatingGambit.Systems.Mutations
 
             foreach (var mutation in pieceMutations[attacker])
             {
-                mutation.OnCapture(attacker, captured, board);
+                mutation.OnCapture(attacker, captured, from, to, board);
             }
         }
 

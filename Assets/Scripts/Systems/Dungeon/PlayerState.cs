@@ -39,6 +39,9 @@ namespace MutatingGambit.Systems.Dungeon
         [SerializeField]
         private int floorsCleared = 0;
 
+        [SerializeField]
+        private int totalMoves = 0;
+
         /// <summary>
         /// Gets the player's team.
         /// </summary>
@@ -87,6 +90,15 @@ namespace MutatingGambit.Systems.Dungeon
         }
 
         /// <summary>
+        /// Gets or sets the total moves made.
+        /// </summary>
+        public int TotalMoves
+        {
+            get => totalMoves;
+            set => totalMoves = value;
+        }
+
+        /// <summary>
         /// Creates a new player state with a standard chess setup.
         /// </summary>
         public static PlayerState CreateStandardSetup(Team team)
@@ -96,6 +108,7 @@ namespace MutatingGambit.Systems.Dungeon
             state.currency = 0;
             state.roomsCleared = 0;
             state.floorsCleared = 0;
+            state.totalMoves = 0;
 
             // Create standard chess pieces
             state.pieces = CreateStandardChessPieces(team);
@@ -306,7 +319,30 @@ namespace MutatingGambit.Systems.Dungeon
 
             pieces.Clear();
             collectedArtifacts.Clear();
-            // brokenPieces.Clear(); // TODO: Add broken pieces to save data
+            brokenPieces.Clear();
+            
+            // Restore broken pieces
+            if (data.BrokenPieces != null)
+            {
+                foreach (var pieceData in data.BrokenPieces)
+                {
+                    var stateData = new PieceStateData(pieceData.Type, Team.White, pieceData.Position);
+                    
+                    // Restore mutations for broken pieces
+                    if (pieceData.MutationNames != null)
+                    {
+                        foreach (var mutationName in pieceData.MutationNames)
+                        {
+                            var mutation = mutationLib.GetMutationByName(mutationName);
+                            if (mutation != null)
+                            {
+                                stateData.mutations.Add(mutation);
+                            }
+                        }
+                    }
+                    brokenPieces.Add(stateData);
+                }
+            }
 
             // Restore pieces
             foreach (var pieceData in data.Pieces)

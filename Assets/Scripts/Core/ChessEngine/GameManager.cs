@@ -239,6 +239,17 @@ namespace MutatingGambit.Core.ChessEngine
 
             if (success)
             {
+                // Notify mutations
+                if (MutatingGambit.Systems.Mutations.MutationManager.Instance != null)
+                {
+                    MutatingGambit.Systems.Mutations.MutationManager.Instance.NotifyMove(movingPiece, from, to, board);
+                    
+                    if (capturedPiece != null)
+                    {
+                        MutatingGambit.Systems.Mutations.MutationManager.Instance.NotifyCapture(movingPiece, capturedPiece, from, to, board);
+                    }
+                }
+
                 // Handle captured piece
                 if (capturedPiece != null)
                 {

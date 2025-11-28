@@ -38,6 +38,11 @@ namespace MutatingGambit.Systems.Dungeon
         /// <summary>
         /// Starting room of the dungeon.
         /// </summary>
-        Start
+        Start,
+
+        /// <summary>
+        /// Tutorial room for teaching game mechanics.
+        /// </summary>
+        Tutorial
     }
 }

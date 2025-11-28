@@ -87,10 +87,15 @@ namespace MutatingGambit.Tests.PlayMode
             
             yield return null;
         }
-    }
-    public class TestMutation : Mutation
-    {
-        public override void ApplyToPiece(Piece piece) { }
-        public override void RemoveFromPiece(Piece piece) { }
+
+        /// <summary>
+        /// Test mutation class for testing purposes.
+        /// Nested as private class to avoid namespace pollution.
+        /// </summary>
+        private class TestMutation : Mutation
+        {
+            public override void ApplyToPiece(Piece piece) { }
+            public override void RemoveFromPiece(Piece piece) { }
+        }
     }
 }

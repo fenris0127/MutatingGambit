@@ -30,36 +30,40 @@ namespace MutatingGambit.Systems.Mutations
             // No cleanup needed
         }
 
-        public override void OnCapture(Piece mutatedPiece, Piece capturedPiece, Board board)
+        public override void OnCapture(Piece mutatedPiece, Piece capturedPiece, Vector2Int fromPos, Vector2Int toPos, Board board)
         {
-            // This should be called from outside when a capture happens
-            // For now we just log it - actual spawning would need GameManager integration
-            Debug.Log($"SplittingKnight: {mutatedPiece} captured {capturedPiece}. Would spawn pawn at original position.");
-
-            // Future implementation would:
-            // 1. Get the position before the knight moved (need to track this)
-            // 2. Check if that position is now empty
-            // 3. Spawn a pawn there
+            // Spawn pawn at original position
+            SpawnPawn(fromPos, mutatedPiece.Team, board);
         }
 
         /// <summary>
         /// Spawns a pawn at the specified position.
-        /// This is a placeholder - actual implementation needs piece instantiation system.
         /// </summary>
         private void SpawnPawn(Vector2Int position, Team team, Board board)
         {
-            // TODO: Implement when piece instantiation system is ready
-            Debug.Log($"Would spawn {team} pawn at {position.ToNotation()}");
+            // Check if position is valid and empty
+            if (!board.IsPositionValid(position) || board.GetPiece(position) != null)
+            {
+                Debug.LogWarning($"SplittingKnight: Cannot spawn pawn at {position}, invalid or occupied.");
+                return;
+            }
 
-            /* Future implementation:
             if (pawnPrefab != null)
             {
                 GameObject pawnObject = Instantiate(pawnPrefab);
                 Piece pawn = pawnObject.GetComponent<Piece>();
+                if (pawn == null) pawn = pawnObject.AddComponent<Piece>();
+                
                 pawn.Initialize(PieceType.Pawn, team, position);
                 board.PlacePiece(pawn, position);
             }
-            */
+            else
+            {
+                // Fallback to board's spawn method
+                board.SpawnPiece(PieceType.Pawn, team, position);
+            }
+            
+            Debug.Log($"SplittingKnight: Spawned pawn at {position}");
         }
     }
 }

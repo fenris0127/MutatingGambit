@@ -97,8 +97,26 @@ namespace MutatingGambit.UI
         {
             UpdateVisuals(false);
 
-            // Animate repair (requires animation system or DOTween)
-            // TODO: Implement with Unity's built-in animation or coroutine
+            // Animate repair
+            StartCoroutine(RepairAnimationRoutine());
+        }
+
+        private System.Collections.IEnumerator RepairAnimationRoutine()
+        {
+             if (pieceRenderer != null)
+             {
+                 Color original = normalTint;
+                 float duration = 0.5f;
+                 float elapsed = 0f;
+                 while (elapsed < duration)
+                 {
+                     elapsed += Time.deltaTime;
+                     float t = elapsed / duration;
+                     pieceRenderer.color = Color.Lerp(Color.green, original, t);
+                     yield return null;
+                 }
+                 pieceRenderer.color = original;
+             }
         }
 
         /// <summary>
@@ -106,14 +124,26 @@ namespace MutatingGambit.UI
         /// </summary>
         private void AnimateBreaking()
         {
-            // Simple visual update without animation (requires LeanTween or DOTween)
-            // TODO: Implement shake and fade with coroutine or Unity Animation
             UpdateVisuals(true);
+            StartCoroutine(ShakeRoutine());
+        }
 
-            if (pieceRenderer != null)
+        private System.Collections.IEnumerator ShakeRoutine()
+        {
+            Vector3 originalPos = transform.localPosition;
+            float duration = 0.5f;
+            float magnitude = 0.1f;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
             {
-                pieceRenderer.color = brokenTint;
+                elapsed += Time.deltaTime;
+                float x = Random.Range(-1f, 1f) * magnitude;
+                float y = Random.Range(-1f, 1f) * magnitude;
+                transform.localPosition = originalPos + new Vector3(x, y, 0);
+                yield return null;
             }
+            transform.localPosition = originalPos;
         }
 
         /// <summary>

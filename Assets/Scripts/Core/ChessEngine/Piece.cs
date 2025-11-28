@@ -86,15 +86,20 @@ namespace MutatingGambit.Core.ChessEngine
 
         /// <summary>
         /// Promotes this piece to a Queen.
+        /// Uses MovementRuleFactory to prevent memory leaks.
         /// </summary>
         public void PromoteToQueen()
         {
             pieceType = PieceType.Queen;
             movementRules.Clear();
             
-            // Add Queen rules (Straight + Diagonal)
-            AddMovementRule(ScriptableObject.CreateInstance<StraightLineRule>());
-            AddMovementRule(ScriptableObject.CreateInstance<DiagonalRule>());
+            // Add Queen rules using factory to prevent memory leaks
+            var factory = MovementRules.MovementRuleFactory.Instance;
+            var queenRules = factory.GetQueenRules();
+            foreach (var rule in queenRules)
+            {
+                AddMovementRule(rule);
+            }
             
             Debug.Log($"{team} Piece at {position} promoted to Queen!");
         }

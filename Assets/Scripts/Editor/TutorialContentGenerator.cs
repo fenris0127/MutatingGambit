@@ -67,24 +67,17 @@ namespace MutatingGambit.Editor
 
         private static void CreateTutorialRoom()
         {
-            // TODO: This method needs to use SerializedObject to set readonly properties
-            // For now, create the asset manually in the Unity Editor
-            // Or use reflection/SerializedObject API
-
-            Debug.LogWarning("TutorialRoom creation skipped - properties are readonly. Create manually in Unity Editor.");
-
-            /* Example of how to use SerializedObject:
             RoomData room = ScriptableObject.CreateInstance<RoomData>();
-            room.name = "TutorialRoom";
-
+            
             SerializedObject serializedRoom = new SerializedObject(room);
             serializedRoom.FindProperty("roomName").stringValue = "Training Grounds";
-            serializedRoom.FindProperty("roomDescription").stringValue = "Learn the basics of combat.";
-            serializedRoom.FindProperty("roomType").enumValueIndex = (int)RoomType.Start;
+            serializedRoom.FindProperty("roomDescription").stringValue = "Learn the basics of Mutating Gambit combat.";
+            serializedRoom.FindProperty("roomType").enumValueIndex = (int)RoomType.Tutorial;
+            serializedRoom.FindProperty("difficulty").intValue = 1;
             serializedRoom.ApplyModifiedProperties();
-
+            
             AssetDatabase.CreateAsset(room, "Assets/Resources/Rooms/TutorialRoom.asset");
-            */
+            Debug.Log("TutorialRoom created successfully!");
         }
     }
 }

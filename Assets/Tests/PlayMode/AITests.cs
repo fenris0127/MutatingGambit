@@ -38,45 +38,15 @@ namespace MutatingGambit.Tests
 
         /// <summary>
         /// Creates a test AI config with default values.
-        /// ScriptableObject.CreateInstance doesn't apply SerializeField defaults.
+        /// Uses AIConfig.CreateForTesting() instead of fragile reflection.
         /// </summary>
         private AIConfig CreateTestAIConfig()
         {
-            var config = ScriptableObject.CreateInstance<AIConfig>();
-            
-            // Use reflection to set default values
-            var type = typeof(AIConfig);
-            
-            type.GetField("searchDepth", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(config, 3);
-            type.GetField("maxTimePerMove", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(config, 1000); // Longer for tests
-            type.GetField("useIterativeDeepening", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(config, false); // Faster for tests
-            type.GetField("materialWeight", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(config, 1.0f);
-            type.GetField("positionalWeight", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(config, 0.3f);
-            type.GetField("kingSafetyWeight", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(config, 0.5f);
-            type.GetField("mobilityWeight", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(config, 0.2f);
-            type.GetField("randomnessFactor", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(config, 0.1f);
-            type.GetField("pawnValue", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(config, 1.0f);
-            type.GetField("knightValue", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(config, 3.0f);
-            type.GetField("bishopValue", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(config, 3.0f);
-            type.GetField("rookValue", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(config, 5.0f);
-            type.GetField("queenValue", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(config, 9.0f);
-            type.GetField("kingValue", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(config, 100.0f);
-            
-            return config;
+            return AIConfig.CreateForTesting(
+                searchDepth: 3,
+                maxTimePerMove: 1000,
+                useIterativeDeepening: false
+            );
         }
 
         [TearDown]

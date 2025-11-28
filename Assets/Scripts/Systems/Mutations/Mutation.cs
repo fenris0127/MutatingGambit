@@ -161,7 +161,7 @@ namespace MutatingGambit.Systems.Mutations
         /// Called when the mutated piece captures an enemy piece.
         /// Override this for mutations that trigger on capture (e.g., SplittingKnight).
         /// </summary>
-        public virtual void OnCapture(Piece mutatedPiece, Piece capturedPiece, Core.ChessEngine.Board board)
+        public virtual void OnCapture(Piece mutatedPiece, Piece capturedPiece, Vector2Int fromPos, Vector2Int toPos, Core.ChessEngine.Board board)
         {
             // Default: do nothing
         }

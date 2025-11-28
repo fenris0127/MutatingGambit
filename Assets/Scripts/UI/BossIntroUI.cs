@@ -88,20 +88,33 @@ namespace MutatingGambit.UI
         /// <summary>
         /// Animates the boss introduction.
         /// </summary>
+        /// <summary>
+        /// Animates the boss introduction.
+        /// </summary>
         private void AnimateIntro()
         {
             if (introPanel == null) return;
 
-            // Simple fade in (requires LeanTween or DOTween for animation)
-            // TODO: Implement with Unity's built-in animation or coroutine
             CanvasGroup canvasGroup = introPanel.GetComponent<CanvasGroup>();
-
             if (canvasGroup == null)
             {
                 canvasGroup = introPanel.AddComponent<CanvasGroup>();
             }
 
-            canvasGroup.alpha = 1f; // Instantly show for now
+            canvasGroup.alpha = 0f;
+            StartCoroutine(FadeInRoutine(canvasGroup, introAnimationDuration));
+        }
+
+        private System.Collections.IEnumerator FadeInRoutine(CanvasGroup group, float duration)
+        {
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                group.alpha = Mathf.Clamp01(elapsed / duration);
+                yield return null;
+            }
+            group.alpha = 1f;
         }
 
         /// <summary>
@@ -111,10 +124,27 @@ namespace MutatingGambit.UI
         {
             if (introPanel != null)
             {
-                // Simple hide (requires animation library for fade out)
-                // TODO: Implement fade out with coroutine or Unity Animation
-                introPanel.SetActive(false);
+                StartCoroutine(FadeOutAndDisable(introPanel, 0.5f));
             }
+        }
+
+        private System.Collections.IEnumerator FadeOutAndDisable(GameObject panel, float duration)
+        {
+            CanvasGroup group = panel.GetComponent<CanvasGroup>();
+            if (group == null) group = panel.AddComponent<CanvasGroup>();
+
+            float startAlpha = group.alpha;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                group.alpha = Mathf.Lerp(startAlpha, 0f, elapsed / duration);
+                yield return null;
+            }
+
+            group.alpha = 0f;
+            panel.SetActive(false);
         }
 
         /// <summary>

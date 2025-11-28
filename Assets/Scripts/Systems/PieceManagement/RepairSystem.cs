@@ -138,8 +138,24 @@ namespace MutatingGambit.Systems.PieceManagement
             // Check repair cost (if using currency system)
             if (usesRepairCost && pieceHealth.RepairCost > 0)
             {
-                // TODO: Implement currency check
-                Debug.Log($"Repair cost: {pieceHealth.RepairCost} (currency system not implemented)");
+                var dungeonManager = MutatingGambit.Systems.Dungeon.DungeonManager.Instance;
+                if (dungeonManager != null && dungeonManager.PlayerState != null)
+                {
+                    if (dungeonManager.PlayerState.Currency >= pieceHealth.RepairCost)
+                    {
+                        dungeonManager.PlayerState.Currency -= pieceHealth.RepairCost;
+                        Debug.Log($"Paid {pieceHealth.RepairCost} for repair. Remaining: {dungeonManager.PlayerState.Currency}");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Not enough currency to repair!");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("Cannot check currency - DungeonManager or PlayerState not found.");
+                }
             }
 
             bool repaired = pieceHealth.RepairPiece();

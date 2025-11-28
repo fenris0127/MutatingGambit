@@ -19,6 +19,8 @@ namespace MutatingGambit.Systems.Tutorial
         private Board board;
         [SerializeField]
         private TutorialUI tutorialUI;
+        [SerializeField]
+        private GameObject highlightPrefab;
 
         private int currentStepIndex = -1;
         private bool isTutorialActive = false;
@@ -88,7 +90,34 @@ namespace MutatingGambit.Systems.Tutorial
             }
 
             // Highlight tiles
-            // TODO: Implement tile highlighting in Board or EffectManager
+            ClearHighlights();
+            
+            if (step.restrictMovement)
+            {
+                if (step.requiredMoveFrom.x >= 0) HighlightTile(step.requiredMoveFrom);
+                if (step.requiredMoveTo.x >= 0) HighlightTile(step.requiredMoveTo);
+            }
+        }
+
+        private List<GameObject> activeHighlights = new List<GameObject>();
+
+        private void HighlightTile(Vector2Int position)
+        {
+            if (highlightPrefab == null) return;
+
+            // Assuming board is at z=0 or similar
+            Vector3 worldPos = new Vector3(position.x, position.y, 0);
+            GameObject highlight = Instantiate(highlightPrefab, worldPos, Quaternion.identity);
+            activeHighlights.Add(highlight);
+        }
+
+        private void ClearHighlights()
+        {
+            foreach (var highlight in activeHighlights)
+            {
+                if (highlight != null) Destroy(highlight);
+            }
+            activeHighlights.Clear();
         }
 
         public void EndTutorial()
@@ -98,6 +127,7 @@ namespace MutatingGambit.Systems.Tutorial
             {
                 tutorialUI.Hide();
             }
+            ClearHighlights();
             Debug.Log("Tutorial Completed");
         }
 

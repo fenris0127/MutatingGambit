@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using MutatingGambit.Systems.Tutorial;
 
@@ -11,8 +12,13 @@ namespace MutatingGambit.Core.ChessEngine
         [SerializeField]
         private GameManager gameManager;
 
+        [Header("Visualization")]
+        [SerializeField]
+        private GameObject highlightPrefab;
+
         private Piece selectedPiece;
         private Camera mainCamera;
+        private List<Vector2Int> highlightedMoves = new List<Vector2Int>();
 
         private void Start()
         {
@@ -74,7 +80,11 @@ namespace MutatingGambit.Core.ChessEngine
                 if (clickedPiece != null && clickedPiece.Team == gameManager.PlayerTeam)
                 {
                     selectedPiece = clickedPiece;
-                    // TODO: Show highlights
+                    
+                    // Show highlights for valid moves
+                    highlightedMoves = selectedPiece.GetValidMoves(board);
+                    HighlightMoves(highlightedMoves);
+                    
                     Debug.Log($"Selected {selectedPiece}");
                 }
             }
@@ -84,7 +94,12 @@ namespace MutatingGambit.Core.ChessEngine
                 if (clickedPiece != null && clickedPiece.Team == gameManager.PlayerTeam)
                 {
                     // Change selection
+                    ClearHighlights();
+                    
                     selectedPiece = clickedPiece;
+                    highlightedMoves = selectedPiece.GetValidMoves(board);
+                    HighlightMoves(highlightedMoves);
+                    
                     Debug.Log($"Selected {selectedPiece}");
                 }
                 else
@@ -103,8 +118,9 @@ namespace MutatingGambit.Core.ChessEngine
                     bool success = gameManager.ExecuteMove(selectedPiece.Position, gridPos);
                     if (success)
                     {
+                        // Clear highlights and deselect
+                        ClearHighlights();
                         selectedPiece = null;
-                        // TODO: Clear highlights
                     }
                     else
                     {
@@ -112,6 +128,53 @@ namespace MutatingGambit.Core.ChessEngine
                     }
                 }
             }
+        }
+
+        private List<GameObject> activeHighlights = new List<GameObject>();
+
+        /// <summary>
+        /// Highlights the given positions on the board.
+        /// </summary>
+        private void HighlightMoves(List<Vector2Int> positions)
+        {
+            ClearHighlights();
+
+            if (highlightPrefab == null)
+            {
+                // Fallback to debug log if no prefab assigned
+                foreach (var pos in positions)
+                {
+                    Debug.Log($"Highlighting position: {pos}");
+                }
+                return;
+            }
+
+            foreach (var pos in positions)
+            {
+                // Instantiate highlight prefab at position
+                // Assuming board tiles are at (x, y, 0) or similar. 
+                // We might need to adjust Z or Y depending on board orientation.
+                // Assuming 2D for now as per other scripts.
+                Vector3 worldPos = new Vector3(pos.x, pos.y, 0); 
+                GameObject highlight = Instantiate(highlightPrefab, worldPos, Quaternion.identity);
+                activeHighlights.Add(highlight);
+            }
+        }
+
+        /// <summary>
+        /// Clears all move highlights.
+        /// </summary>
+        private void ClearHighlights()
+        {
+            foreach (var highlight in activeHighlights)
+            {
+                if (highlight != null)
+                {
+                    Destroy(highlight);
+                }
+            }
+            activeHighlights.Clear();
+            highlightedMoves.Clear();
         }
     }
 }

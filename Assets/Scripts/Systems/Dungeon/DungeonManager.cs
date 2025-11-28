@@ -47,6 +47,9 @@ namespace MutatingGambit.Systems.Dungeon
         [SerializeField]
         private RepairUI repairUI;
 
+        [SerializeField]
+        private NotificationUI notificationUI;
+
         [Header("Prefabs")]
         [SerializeField]
         private GameObject piecePrefab;
@@ -97,6 +100,26 @@ namespace MutatingGambit.Systems.Dungeon
         /// </summary>
         public PlayerState PlayerState => playerState;
 
+        /// <summary>
+        /// Gets the current floor number.
+        /// </summary>
+        public int CurrentFloor => playerState != null ? playerState.FloorsCleared + 1 : 1;
+
+        /// <summary>
+        /// Gets the index of the current room in the map.
+        /// </summary>
+        public int CurrentRoomIndex
+        {
+            get
+            {
+                if (currentDungeonMap != null && currentRoomNode != null)
+                {
+                    return currentDungeonMap.AllNodes.IndexOf(currentRoomNode);
+                }
+                return 0;
+            }
+        }
+
         private void Awake()
         {
             if (instance != null && instance != this)
@@ -116,7 +139,9 @@ namespace MutatingGambit.Systems.Dungeon
             if (boardGenerator == null) boardGenerator = FindFirstObjectByType<BoardGenerator>();
             if (dungeonMapUI == null) dungeonMapUI = FindFirstObjectByType<DungeonMapUI>();
             if (rewardUI == null) rewardUI = FindFirstObjectByType<RewardSelectionUI>();
+            if (rewardUI == null) rewardUI = FindFirstObjectByType<RewardSelectionUI>();
             if (repairUI == null) repairUI = FindFirstObjectByType<RepairUI>();
+            if (notificationUI == null) notificationUI = FindFirstObjectByType<NotificationUI>();
         }
 
         private void Start()
@@ -204,12 +229,12 @@ namespace MutatingGambit.Systems.Dungeon
             }
 
             // Generate/Restore Map
-            // For MVP, we might regenerate map or just place player at correct floor/room.
-            // Ideally we save the map seed.
+            // Use saved seed for deterministic map generation
             if (mapGenerator != null)
             {
-                // TODO: Use saved seed
-                currentDungeonMap = mapGenerator.GenerateMap(); 
+                // Use saved seed if available, otherwise generate new one
+                int seed = data.Seed != 0 ? data.Seed : UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+                currentDungeonMap = mapGenerator.GenerateMap(seed); 
                 
                 // Set current node
                 // This is tricky without saving the whole graph structure or deterministic generation.
@@ -279,6 +304,7 @@ namespace MutatingGambit.Systems.Dungeon
                 case RoomType.EliteCombat:
                 case RoomType.Boss:
                 case RoomType.Start:
+                case RoomType.Tutorial:
                     EnterCombatRoom(roomNode);
                     break;
 
@@ -305,9 +331,20 @@ namespace MutatingGambit.Systems.Dungeon
                 // Generate board from room data
                 if (roomData.BoardData != null)
                 {
-                    // TODO: BoardGenerator.GenerateBoard method needs to be implemented
-                    // For now, just initialize the board
+                    // Initialize board with specified dimensions
                     gameBoard.Initialize(roomData.BoardData.Width, roomData.BoardData.Height);
+                    
+                    // Place obstacles if defined in BoardData
+                    if (roomData.BoardData.Obstacles != null)
+                    {
+                        foreach (var obstaclePos in roomData.BoardData.Obstacles)
+                        {
+                            if (gameBoard.IsPositionValid(obstaclePos))
+                            {
+                                gameBoard.PlaceObstacle(obstaclePos);
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -381,9 +418,69 @@ namespace MutatingGambit.Systems.Dungeon
         {
             Debug.Log("Entered mystery room - random event");
 
-            // TODO: Implement mystery room events
-            // For now, treat as treasure room
-            EnterTreasureRoom(roomNode);
+            // Random event system - 40% treasure, 30% curse, 30% blessing
+            int roll = UnityEngine.Random.Range(0, 100);
+            
+            if (roll < 40)
+            {
+                // Treasure
+                Debug.Log("Mystery room reveals... Treasure!");
+                EnterTreasureRoom(roomNode);
+            }
+            else if (roll < 70)
+            {
+                // Curse event
+                Debug.Log("Mystery room reveals... A curse!");
+                HandleCurseEvent();
+            }
+            else
+            {
+                // Blessing event
+                Debug.Log("Mystery room reveals... A blessing!");
+                HandleBlessingEvent();
+            }
+        }
+        
+        /// <summary>
+        /// Handles curse event - lose currency or get negative effect.
+        /// </summary>
+        private void HandleCurseEvent()
+        {
+            int currencyLoss = UnityEngine.Random.Range(10, 31);
+            playerState.Currency = Mathf.Max(0, playerState.Currency - currencyLoss);
+            Debug.Log($"Curse! Lost {currencyLoss} currency. Remaining: {playerState.Currency}");
+            
+            // Add UI notification for curse event
+            ShowNotification($"Curse! Lost {currencyLoss} currency.");
+        }
+        
+        /// <summary>
+        /// Handles blessing event - gain currency or heal broken piece.
+        /// </summary>
+        private void HandleBlessingEvent()
+        {
+            int currencyGain = UnityEngine.Random.Range(20, 51);
+            playerState.Currency += currencyGain;
+            Debug.Log($"Blessing! Gained {currencyGain} currency. Total: {playerState.Currency}");
+            
+            // Add UI notification for blessing event
+            ShowNotification($"Blessing! Gained {currencyGain} currency.");
+        }
+
+        /// <summary>
+        /// Shows a notification to the player.
+        /// </summary>
+        /// <summary>
+        /// Shows a notification to the player.
+        /// </summary>
+        private void ShowNotification(string message)
+        {
+            Debug.Log($"[NOTIFICATION] {message}");
+            
+            if (notificationUI != null)
+            {
+                notificationUI.Show(message);
+            }
         }
 
         /// <summary>
@@ -537,9 +634,14 @@ namespace MutatingGambit.Systems.Dungeon
             var gameOverScreen = FindFirstObjectByType<GameOverScreen>();
             if (gameOverScreen != null)
             {
-                // TODO: Check GameOverScreen.ShowDungeonComplete signature
-                // gameOverScreen.ShowDungeonComplete(playerState.Currency, playerState.RoomsCleared);
-                Debug.Log($"Dungeon Complete! Currency: {playerState.Currency}, Rooms: {playerState.RoomsCleared}");
+                var stats = new UI.GameStats
+                {
+                    RoomsCleared = playerState.RoomsCleared,
+                    ArtifactsCollected = playerState.CollectedArtifacts.Count,
+                    PiecesLost = playerState.BrokenPieces.Count,
+                    TotalMoves = playerState.TotalMoves
+                };
+                gameOverScreen.ShowDungeonComplete(stats);
             }
             
             // Clear save file
