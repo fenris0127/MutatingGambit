@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using MutatingGambit.Systems.Dungeon;
-using MutatingGambit.Systems.Board;
+using MutatingGambit.Systems.BoardSystem;
 using MutatingGambit.Core.ChessEngine;
 using System.IO;
 

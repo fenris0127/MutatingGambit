@@ -1,7 +1,7 @@
 using UnityEngine;
 using MutatingGambit.Core.ChessEngine;
 
-namespace MutatingGambit.Systems.Board
+namespace MutatingGambit.Systems.BoardSystem
 {
     /// <summary>
     /// Represents a single tile on the chess board.

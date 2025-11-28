@@ -1,5 +1,5 @@
 using UnityEngine;
-using MutatingGambit.Systems.Board;
+using MutatingGambit.Systems.BoardSystem;
 using MutatingGambit.Systems.Artifacts;
 using MutatingGambit.Systems.Mutations;
 using MutatingGambit.Core.ChessEngine;

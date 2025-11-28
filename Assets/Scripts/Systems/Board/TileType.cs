@@ -1,4 +1,4 @@
-namespace MutatingGambit.Systems.Board
+namespace MutatingGambit.Systems.BoardSystem
 {
     /// <summary>
     /// Defines the types of tiles that can exist on the board.

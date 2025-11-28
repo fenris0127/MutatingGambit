@@ -35,9 +35,9 @@ namespace MutatingGambit.AI
         /// </summary>
         public string BossDescription => bossDescription;
 
-        private new void Awake()
-        {
-            base.Awake();
+        private 
+        void Awake()
+        {   
             remainingCharges = specialAbilityCharges;
         }
 

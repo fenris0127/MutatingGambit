@@ -92,7 +92,8 @@ namespace MutatingGambit.UI
         {
             if (introPanel == null) return;
 
-            // Fade in animation
+            // Simple fade in (requires LeanTween or DOTween for animation)
+            // TODO: Implement with Unity's built-in animation or coroutine
             CanvasGroup canvasGroup = introPanel.GetComponent<CanvasGroup>();
 
             if (canvasGroup == null)
@@ -100,21 +101,7 @@ namespace MutatingGambit.UI
                 canvasGroup = introPanel.AddComponent<CanvasGroup>();
             }
 
-            canvasGroup.alpha = 0f;
-
-            LeanTween.alphaCanvas(canvasGroup, 1f, introAnimationDuration)
-                .setEaseInOutQuad();
-
-            // Scale animation
-            RectTransform rectTransform = introPanel.GetComponent<RectTransform>();
-
-            if (rectTransform != null)
-            {
-                rectTransform.localScale = Vector3.zero;
-
-                LeanTween.scale(rectTransform, Vector3.one, introAnimationDuration)
-                    .setEaseOutBack();
-            }
+            canvasGroup.alpha = 1f; // Instantly show for now
         }
 
         /// <summary>
@@ -124,24 +111,9 @@ namespace MutatingGambit.UI
         {
             if (introPanel != null)
             {
-                if (useAnimations)
-                {
-                    CanvasGroup canvasGroup = introPanel.GetComponent<CanvasGroup>();
-
-                    if (canvasGroup != null)
-                    {
-                        LeanTween.alphaCanvas(canvasGroup, 0f, 0.5f)
-                            .setOnComplete(() => introPanel.SetActive(false));
-                    }
-                    else
-                    {
-                        introPanel.SetActive(false);
-                    }
-                }
-                else
-                {
-                    introPanel.SetActive(false);
-                }
+                // Simple hide (requires animation library for fade out)
+                // TODO: Implement fade out with coroutine or Unity Animation
+                introPanel.SetActive(false);
             }
         }
 

@@ -17,7 +17,15 @@ namespace MutatingGambit.Systems.Artifacts
         [SerializeField]
         private int damageRadius = 1;
 
-        public override void OnPieceCaptured(Board board, Piece capturedPiece, Piece capturingPiece)
+        public override void ApplyEffect(Board board, ArtifactContext context)
+        {
+            if (context != null && context.CapturedPiece != null)
+            {
+                OnPieceCaptured(board, context.CapturedPiece, context.MovedPiece);
+            }
+        }
+
+        public void OnPieceCaptured(Board board, Piece capturedPiece, Piece capturingPiece)
         {
             if (capturedPiece == null) return;
 
@@ -51,14 +59,16 @@ namespace MutatingGambit.Systems.Artifacts
     [CreateAssetMenu(fileName = "PromotionPrivilege", menuName = "Artifacts/Promotion Privilege")]
     public class PromotionPrivilegeArtifact : Artifact
     {
-        [Header("Promotion Settings")]
+        public override void ApplyEffect(Board board, ArtifactContext context) { }
+
+                [Header("Promotion Settings")]
         [SerializeField]
         private int capturesRequired = 3;
 
         private System.Collections.Generic.Dictionary<Piece, int> pawnCaptures =
             new System.Collections.Generic.Dictionary<Piece, int>();
 
-        public override void OnPieceCaptured(Board board, Piece capturedPiece, Piece capturingPiece)
+        public void OnPieceCaptured(Board board, Piece capturedPiece, Piece capturingPiece)
         {
             if (capturingPiece == null || capturingPiece.Type != PieceType.Pawn)
                 return;
@@ -77,7 +87,7 @@ namespace MutatingGambit.Systems.Artifacts
             }
         }
 
-        public override void Reset()
+        public void Reset()
         {
             pawnCaptures.Clear();
         }
@@ -89,7 +99,9 @@ namespace MutatingGambit.Systems.Artifacts
     [CreateAssetMenu(fileName = "FrozenThrone", menuName = "Artifacts/Frozen Throne")]
     public class FrozenThroneArtifact : Artifact
     {
-        public override void OnApplied(Board board)
+        public override void ApplyEffect(Board board, ArtifactContext context) { }
+
+                public void OnApplied(Board board)
         {
             // This would modify king movement rules
             Debug.Log("Frozen Throne: Kings are immobilized but attack range increased!");
@@ -102,7 +114,9 @@ namespace MutatingGambit.Systems.Artifacts
     [CreateAssetMenu(fileName = "MimicsMask", menuName = "Artifacts/Mimic's Mask")]
     public class MimicsMaskArtifact : Artifact
     {
-        public override void OnTurnStart(Board board, Team currentTeam)
+        public override void ApplyEffect(Board board, ArtifactContext context) { }
+
+                public void OnTurnStart(Board board, Team currentTeam)
         {
             var pieces = board.GetPiecesByTeam(currentTeam);
             if (pieces.Count == 0) return;
@@ -121,10 +135,12 @@ namespace MutatingGambit.Systems.Artifacts
     [CreateAssetMenu(fileName = "BerserkersRage", menuName = "Artifacts/Berserker's Rage")]
     public class BerserkersRageArtifact : Artifact
     {
-        private System.Collections.Generic.HashSet<Piece> rageActivatedPieces =
+        public override void ApplyEffect(Board board, ArtifactContext context) { }
+
+                private System.Collections.Generic.HashSet<Piece> rageActivatedPieces =
             new System.Collections.Generic.HashSet<Piece>();
 
-        public override void OnPieceCaptured(Board board, Piece capturedPiece, Piece capturingPiece)
+        public void OnPieceCaptured(Board board, Piece capturedPiece, Piece capturingPiece)
         {
             if (capturingPiece != null)
             {
@@ -133,7 +149,7 @@ namespace MutatingGambit.Systems.Artifacts
             }
         }
 
-        public override void OnTurnEnd(Board board, Team currentTeam)
+        public void OnTurnEnd(Board board, Team currentTeam)
         {
             rageActivatedPieces.Clear();
         }
@@ -145,9 +161,11 @@ namespace MutatingGambit.Systems.Artifacts
     [CreateAssetMenu(fileName = "SanctuaryShield", menuName = "Artifacts/Sanctuary Shield")]
     public class SanctuaryShieldArtifact : Artifact
     {
-        private bool shieldUsed = false;
+        public override void ApplyEffect(Board board, ArtifactContext context) { }
 
-        public override void OnPieceCaptured(Board board, Piece capturedPiece, Piece capturingPiece)
+                private bool shieldUsed = false;
+
+        public void OnPieceCaptured(Board board, Piece capturedPiece, Piece capturingPiece)
         {
             if (!shieldUsed && capturedPiece != null)
             {
@@ -157,7 +175,7 @@ namespace MutatingGambit.Systems.Artifacts
             }
         }
 
-        public override void Reset()
+        public void Reset()
         {
             shieldUsed = false;
         }
@@ -169,7 +187,9 @@ namespace MutatingGambit.Systems.Artifacts
     [CreateAssetMenu(fileName = "PhantomSteps", menuName = "Artifacts/Phantom Steps")]
     public class PhantomStepsArtifact : Artifact
     {
-        public override void OnApplied(Board board)
+        public override void ApplyEffect(Board board, ArtifactContext context) { }
+
+                public void OnApplied(Board board)
         {
             Debug.Log("Phantom Steps: All pieces can phase through one enemy!");
         }
@@ -181,7 +201,9 @@ namespace MutatingGambit.Systems.Artifacts
     [CreateAssetMenu(fileName = "TwinSouls", menuName = "Artifacts/Twin Souls")]
     public class TwinSoulsArtifact : Artifact
     {
-        public override void OnPieceCaptured(Board board, Piece capturedPiece, Piece capturingPiece)
+        public override void ApplyEffect(Board board, ArtifactContext context) { }
+
+                public void OnPieceCaptured(Board board, Piece capturedPiece, Piece capturingPiece)
         {
             if (capturingPiece == null || capturingPiece.Type == PieceType.Pawn)
                 return;
@@ -199,7 +221,9 @@ namespace MutatingGambit.Systems.Artifacts
     [CreateAssetMenu(fileName = "CursedCrown", menuName = "Artifacts/Cursed Crown")]
     public class CursedCrownArtifact : Artifact
     {
-        public override void OnTurnStart(Board board, Team currentTeam)
+        public override void ApplyEffect(Board board, ArtifactContext context) { }
+
+                public void OnTurnStart(Board board, Team currentTeam)
         {
             Team enemyTeam = currentTeam == Team.White ? Team.Black : Team.White;
             var enemyPieces = board.GetPiecesByTeam(enemyTeam);
@@ -221,9 +245,11 @@ namespace MutatingGambit.Systems.Artifacts
     [CreateAssetMenu(fileName = "DivineIntervention", menuName = "Artifacts/Divine Intervention")]
     public class DivineInterventionArtifact : Artifact
     {
-        private bool interventionUsed = false;
+        public override void ApplyEffect(Board board, ArtifactContext context) { }
 
-        public override void Reset()
+                private bool interventionUsed = false;
+
+        public void Reset()
         {
             interventionUsed = false;
         }
@@ -235,7 +261,9 @@ namespace MutatingGambit.Systems.Artifacts
     [CreateAssetMenu(fileName = "HasteBoots", menuName = "Artifacts/Haste Boots")]
     public class HasteBootsArtifact : Artifact
     {
-        public override void OnApplied(Board board)
+        public override void ApplyEffect(Board board, ArtifactContext context) { }
+
+                public void OnApplied(Board board)
         {
             Debug.Log("Haste Boots: All pieces gain increased movement range!");
         }
@@ -247,9 +275,11 @@ namespace MutatingGambit.Systems.Artifacts
     [CreateAssetMenu(fileName = "SacrificialAltar", menuName = "Artifacts/Sacrificial Altar")]
     public class SacrificialAltarArtifact : Artifact
     {
-        private int sacrificesAvailable = 1;
+        public override void ApplyEffect(Board board, ArtifactContext context) { }
 
-        public override void Reset()
+                private int sacrificesAvailable = 1;
+
+        public void Reset()
         {
             sacrificesAvailable = 1;
         }
@@ -261,7 +291,9 @@ namespace MutatingGambit.Systems.Artifacts
     [CreateAssetMenu(fileName = "WeakeningAura", menuName = "Artifacts/Weakening Aura")]
     public class WeakeningAuraArtifact : Artifact
     {
-        public override void OnApplied(Board board)
+        public override void ApplyEffect(Board board, ArtifactContext context) { }
+
+                public void OnApplied(Board board)
         {
             Debug.Log("Weakening Aura: Enemy movement range reduced!");
         }
@@ -273,11 +305,13 @@ namespace MutatingGambit.Systems.Artifacts
     [CreateAssetMenu(fileName = "ResurrectionStone", menuName = "Artifacts/Resurrection Stone")]
     public class ResurrectionStoneArtifact : Artifact
     {
-        private Piece deadPiece = null;
+        public override void ApplyEffect(Board board, ArtifactContext context) { }
+
+                private Piece deadPiece = null;
         private int turnsSinceDeath = 0;
         private const int REVIVAL_TURNS = 3;
 
-        public override void OnPieceCaptured(Board board, Piece capturedPiece, Piece capturingPiece)
+        public void OnPieceCaptured(Board board, Piece capturedPiece, Piece capturingPiece)
         {
             if (deadPiece == null && capturedPiece != null)
             {
@@ -287,7 +321,7 @@ namespace MutatingGambit.Systems.Artifacts
             }
         }
 
-        public override void OnTurnEnd(Board board, Team currentTeam)
+        public void OnTurnEnd(Board board, Team currentTeam)
         {
             if (deadPiece != null)
             {
@@ -302,7 +336,7 @@ namespace MutatingGambit.Systems.Artifacts
             }
         }
 
-        public override void Reset()
+        public void Reset()
         {
             deadPiece = null;
             turnsSinceDeath = 0;

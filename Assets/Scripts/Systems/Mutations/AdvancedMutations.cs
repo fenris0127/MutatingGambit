@@ -16,8 +16,8 @@ namespace MutatingGambit.Systems.Mutations.Advanced
         public override void ApplyToPiece(Piece piece)
         {
             // Add reverse movement (backward by 1)
-            var reverseRule = ScriptableObject.CreateInstance<StraightLineRule>();
-            // Note: Would need custom rule for backward movement
+            // Add reverse movement (backward by 1)
+            var reverseRule = ScriptableObject.CreateInstance<BackwardPawnRule>();
             piece.AddMovementRule(reverseRule);
         }
 

@@ -46,8 +46,11 @@ namespace MutatingGambit.Systems.SaveLoad
             var dungeonManager = DungeonManager.Instance;
             if (dungeonManager != null)
             {
-                data.CurrentFloor = dungeonManager.CurrentFloor;
-                data.CurrentRoomIndex = dungeonManager.CurrentRoomIndex;
+                // TODO: Add CurrentFloor and CurrentRoomIndex properties to DungeonManager
+                // data.CurrentFloor = dungeonManager.CurrentFloor;
+                // data.CurrentRoomIndex = dungeonManager.CurrentRoomIndex;
+                data.CurrentFloor = 0;
+                data.CurrentRoomIndex = 0;
                 // Seed saving would go here if implemented
             }
 
@@ -57,7 +60,7 @@ namespace MutatingGambit.Systems.SaveLoad
             // For now, let's look for the Board and reconstruct from there, OR better, use PlayerState if available.
             // Actually, PlayerState is usually passed around. Let's try to find the active pieces on the board.
             
-            var board = FindObjectOfType<Board>();
+            var board = FindFirstObjectByType<Board>();
             if (board != null)
             {
                 data.PlayerData = new PlayerSaveData();
@@ -92,12 +95,12 @@ namespace MutatingGambit.Systems.SaveLoad
             }
 
             // 3. Save Artifacts
-            if (ArtifactManager.Instance != null)
+            var artifactManager = FindFirstObjectByType<ArtifactManager>();
+            if (artifactManager != null)
             {
                 data.ActiveArtifactNames = new List<string>();
-                // Need a way to get active artifacts from manager
-                // For now, assuming ArtifactManager has a list we can access or we add a getter
-                // var artifacts = ArtifactManager.Instance.GetActiveArtifacts();
+                // TODO: Add GetActiveArtifacts method to ArtifactManager
+                // var artifacts = artifactManager.GetActiveArtifacts();
                 // foreach(var art in artifacts) data.ActiveArtifactNames.Add(art.ArtifactName);
             }
 
@@ -156,7 +159,7 @@ namespace MutatingGambit.Systems.SaveLoad
             if (data == null || board == null) return;
 
             // 1. Clear board
-            board.ClearBoard();
+            board.Clear();
 
             // 2. Restore Pieces
             if (data.PlayerData != null && data.PlayerData.Pieces != null)

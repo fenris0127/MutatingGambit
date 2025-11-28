@@ -85,6 +85,21 @@ namespace MutatingGambit.Core.ChessEngine
         }
 
         /// <summary>
+        /// Promotes this piece to a Queen.
+        /// </summary>
+        public void PromoteToQueen()
+        {
+            pieceType = PieceType.Queen;
+            movementRules.Clear();
+            
+            // Add Queen rules (Straight + Diagonal)
+            AddMovementRule(ScriptableObject.CreateInstance<StraightLineRule>());
+            AddMovementRule(ScriptableObject.CreateInstance<DiagonalRule>());
+            
+            Debug.Log($"{team} Piece at {position} promoted to Queen!");
+        }
+
+        /// <summary>
         /// Checks if this piece has any mutations (more than standard rules).
         /// </summary>
         public bool HasMutations()

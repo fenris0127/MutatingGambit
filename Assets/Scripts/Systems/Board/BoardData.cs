@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace MutatingGambit.Systems.Board
+namespace MutatingGambit.Systems.BoardSystem
 {
     /// <summary>
     /// ScriptableObject that stores board configuration data.

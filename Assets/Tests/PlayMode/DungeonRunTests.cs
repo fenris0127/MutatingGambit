@@ -54,7 +54,7 @@ namespace MutatingGambit.Tests.PlayMode
             piece.Initialize(PieceType.Pawn, Team.White, new Vector2Int(0, 1));
             
             // Create a dummy mutation
-            Mutation mutation = ScriptableObject.CreateInstance<Mutation>();
+            Mutation mutation = ScriptableObject.CreateInstance<TestMutation>();
             mutation.name = "TestMutation";
             
             mutationManager.ApplyMutation(piece, mutation);
@@ -87,5 +87,10 @@ namespace MutatingGambit.Tests.PlayMode
             
             yield return null;
         }
+    }
+    public class TestMutation : Mutation
+    {
+        public override void ApplyToPiece(Piece piece) { }
+        public override void RemoveFromPiece(Piece piece) { }
     }
 }

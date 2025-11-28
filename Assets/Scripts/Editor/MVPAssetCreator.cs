@@ -3,7 +3,7 @@ using UnityEditor;
 using System.IO;
 using MutatingGambit.Systems.Mutations;
 using MutatingGambit.Systems.Artifacts;
-using MutatingGambit.Systems.Board;
+using MutatingGambit.Systems.BoardSystem;
 using MutatingGambit.Systems.Dungeon;
 using MutatingGambit.AI;
 using MutatingGambit.Core.ChessEngine;
@@ -185,8 +185,11 @@ namespace MutatingGambit.Editor
             var standard = CreateAsset<BoardData>(BOARDS_PATH, "Standard_8x8");
             if (standard != null)
             {
-                standard.Width = 8;
-                standard.Height = 8;
+                // Use SerializedObject to set readonly properties
+                SerializedObject so = new SerializedObject(standard);
+                so.FindProperty("width").intValue = 8;
+                so.FindProperty("height").intValue = 8;
+                so.ApplyModifiedProperties();
                 EditorUtility.SetDirty(standard);
             }
 
@@ -194,8 +197,10 @@ namespace MutatingGambit.Editor
             var small = CreateAsset<BoardData>(BOARDS_PATH, "Small_6x6");
             if (small != null)
             {
-                small.Width = 6;
-                small.Height = 6;
+                SerializedObject so = new SerializedObject(small);
+                so.FindProperty("width").intValue = 6;
+                so.FindProperty("height").intValue = 6;
+                so.ApplyModifiedProperties();
                 EditorUtility.SetDirty(small);
             }
 
@@ -203,8 +208,10 @@ namespace MutatingGambit.Editor
             var obstacles = CreateAsset<BoardData>(BOARDS_PATH, "Obstacles_5x8");
             if (obstacles != null)
             {
-                obstacles.Width = 5;
-                obstacles.Height = 8;
+                SerializedObject so = new SerializedObject(obstacles);
+                so.FindProperty("width").intValue = 5;
+                so.FindProperty("height").intValue = 8;
+                so.ApplyModifiedProperties();
                 // You can set specific obstacles in the inspector later
                 EditorUtility.SetDirty(obstacles);
             }

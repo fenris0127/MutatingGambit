@@ -21,7 +21,7 @@ namespace MutatingGambit.Editor
 
             if (testManager == null)
             {
-                testManager = FindObjectOfType<BalanceTestManager>();
+                testManager = FindFirstObjectByType<BalanceTestManager>();
             }
 
             if (testManager == null)
@@ -37,7 +37,7 @@ namespace MutatingGambit.Editor
 
             // Draw Default Inspector for configuration
             // This allows us to use the List<Mutation> UI from Unity
-            ScriptableObject target = testManager;
+            Object target = testManager;
             SerializedObject so = new SerializedObject(target);
             
             scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);

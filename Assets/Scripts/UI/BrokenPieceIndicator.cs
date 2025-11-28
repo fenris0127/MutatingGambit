@@ -97,16 +97,8 @@ namespace MutatingGambit.UI
         {
             UpdateVisuals(false);
 
-            // Animate repair
-            if (animateBreaking && pieceRenderer != null)
-            {
-                LeanTween.scale(gameObject, Vector3.one * 1.2f, 0.2f)
-                    .setEaseOutBack()
-                    .setOnComplete(() =>
-                    {
-                        LeanTween.scale(gameObject, Vector3.one, 0.2f);
-                    });
-            }
+            // Animate repair (requires animation system or DOTween)
+            // TODO: Implement with Unity's built-in animation or coroutine
         }
 
         /// <summary>
@@ -114,38 +106,13 @@ namespace MutatingGambit.UI
         /// </summary>
         private void AnimateBreaking()
         {
-            if (pieceRenderer == null)
-            {
-                UpdateVisuals(true);
-                return;
-            }
+            // Simple visual update without animation (requires LeanTween or DOTween)
+            // TODO: Implement shake and fade with coroutine or Unity Animation
+            UpdateVisuals(true);
 
-            // Shake and fade
-            Vector3 originalPos = transform.localPosition;
-
-            LeanTween.cancel(gameObject);
-
-            // Shake
-            LeanTween.moveLocalX(gameObject, originalPos.x + 0.1f, 0.05f)
-                .setLoopPingPong(3)
-                .setOnComplete(() =>
-                {
-                    transform.localPosition = originalPos;
-                    UpdateVisuals(true);
-                });
-
-            // Fade
             if (pieceRenderer != null)
             {
-                Color startColor = pieceRenderer.color;
-                LeanTween.value(gameObject, startColor, brokenTint, breakAnimationDuration)
-                    .setOnUpdate((Color c) =>
-                    {
-                        if (pieceRenderer != null)
-                        {
-                            pieceRenderer.color = c;
-                        }
-                    });
+                pieceRenderer.color = brokenTint;
             }
         }
 

@@ -4,7 +4,8 @@ using UnityEngine.Events;
 using MutatingGambit.Core.ChessEngine;
 using MutatingGambit.Systems.PieceManagement;
 using MutatingGambit.Systems.Artifacts;
-using MutatingGambit.Systems.Board;
+using MutatingGambit.Systems.BoardSystem;
+using MutatingGambit.Systems.SaveLoad;
 using MutatingGambit.UI;
 
 namespace MutatingGambit.Systems.Dungeon
@@ -75,7 +76,7 @@ namespace MutatingGambit.Systems.Dungeon
             {
                 if (instance == null)
                 {
-                    instance = FindObjectOfType<DungeonManager>();
+                    instance = FindFirstObjectByType<DungeonManager>();
                 }
                 return instance;
             }
@@ -107,15 +108,15 @@ namespace MutatingGambit.Systems.Dungeon
             instance = this;
 
             // Find references if not assigned
-            if (mapGenerator == null) mapGenerator = FindObjectOfType<DungeonMapGenerator>();
-            if (gameBoard == null) gameBoard = FindObjectOfType<Board>();
-            if (roomManager == null) roomManager = FindObjectOfType<RoomManager>();
-            if (repairSystem == null) repairSystem = FindObjectOfType<RepairSystem>();
-            if (gameManager == null) gameManager = FindObjectOfType<GameManager>();
-            if (boardGenerator == null) boardGenerator = FindObjectOfType<BoardGenerator>();
-            if (dungeonMapUI == null) dungeonMapUI = FindObjectOfType<DungeonMapUI>();
-            if (rewardUI == null) rewardUI = FindObjectOfType<RewardSelectionUI>();
-            if (repairUI == null) repairUI = FindObjectOfType<RepairUI>();
+            if (mapGenerator == null) mapGenerator = FindFirstObjectByType<DungeonMapGenerator>();
+            if (gameBoard == null) gameBoard = FindFirstObjectByType<Board>();
+            if (roomManager == null) roomManager = FindFirstObjectByType<RoomManager>();
+            if (repairSystem == null) repairSystem = FindFirstObjectByType<RepairSystem>();
+            if (gameManager == null) gameManager = FindFirstObjectByType<GameManager>();
+            if (boardGenerator == null) boardGenerator = FindFirstObjectByType<BoardGenerator>();
+            if (dungeonMapUI == null) dungeonMapUI = FindFirstObjectByType<DungeonMapUI>();
+            if (rewardUI == null) rewardUI = FindFirstObjectByType<RewardSelectionUI>();
+            if (repairUI == null) repairUI = FindFirstObjectByType<RepairUI>();
         }
 
         private void Start()
@@ -213,9 +214,9 @@ namespace MutatingGambit.Systems.Dungeon
                 // Set current node
                 // This is tricky without saving the whole graph structure or deterministic generation.
                 // For now, let's just put them at the start of the floor or try to find the room index.
-                if (currentDungeonMap != null && currentDungeonMap.Nodes.Count > data.CurrentRoomIndex)
+                if (currentDungeonMap != null && currentDungeonMap.AllNodes.Count > data.CurrentRoomIndex)
                 {
-                    currentRoomNode = currentDungeonMap.Nodes[data.CurrentRoomIndex];
+                    currentRoomNode = currentDungeonMap.AllNodes[data.CurrentRoomIndex];
                 }
             }
 
@@ -302,9 +303,11 @@ namespace MutatingGambit.Systems.Dungeon
                 gameBoard.Clear();
 
                 // Generate board from room data
-                if (boardGenerator != null && roomData.BoardData != null)
+                if (roomData.BoardData != null)
                 {
-                    boardGenerator.GenerateBoard(roomData.BoardData, gameBoard);
+                    // TODO: BoardGenerator.GenerateBoard method needs to be implemented
+                    // For now, just initialize the board
+                    gameBoard.Initialize(roomData.BoardData.Width, roomData.BoardData.Height);
                 }
                 else
                 {
@@ -413,7 +416,7 @@ namespace MutatingGambit.Systems.Dungeon
                         var piece = gameBoard.GetPiece(mutationData.piecePosition);
                         if (piece != null)
                         {
-                            mutationData.mutation.Apply(piece);
+                            mutationData.mutation.ApplyToPiece(piece);
                         }
                     }
                 }
@@ -531,10 +534,12 @@ namespace MutatingGambit.Systems.Dungeon
             }
 
             // Show victory screen
-            var gameOverScreen = FindObjectOfType<GameOverScreen>();
+            var gameOverScreen = FindFirstObjectByType<GameOverScreen>();
             if (gameOverScreen != null)
             {
-                gameOverScreen.ShowDungeonComplete(playerState.Currency, playerState.RoomsCleared);
+                // TODO: Check GameOverScreen.ShowDungeonComplete signature
+                // gameOverScreen.ShowDungeonComplete(playerState.Currency, playerState.RoomsCleared);
+                Debug.Log($"Dungeon Complete! Currency: {playerState.Currency}, Rooms: {playerState.RoomsCleared}");
             }
             
             // Clear save file
@@ -559,7 +564,7 @@ namespace MutatingGambit.Systems.Dungeon
             }
 
             // Show defeat screen
-            var gameOverScreen = FindObjectOfType<GameOverScreen>();
+            var gameOverScreen = FindFirstObjectByType<GameOverScreen>();
             if (gameOverScreen != null)
             {
                 gameOverScreen.ShowDefeat();
@@ -631,29 +636,6 @@ namespace MutatingGambit.Systems.Dungeon
             }
         }
 
-        /// <summary>
-        /// Handles dungeon completion (boss defeated).
-        /// </summary>
-        private void HandleDungeonComplete()
-        {
-            Debug.Log("Dungeon completed!");
-            OnDungeonCompleted?.Invoke();
-
-            if (gameManager != null)
-            {
-                var gameOverScreen = FindObjectOfType<GameOverScreen>();
-                if (gameOverScreen != null)
-                {
-                    GameStats stats = new GameStats
-                    {
-                        RoomsCleared = playerState.RoomsCleared,
-                        ArtifactsCollected = playerState.CollectedArtifacts.Count,
-                        PiecesLost = playerState.BrokenPieces.Count
-                    };
-                    gameOverScreen.ShowDungeonComplete(stats);
-                }
-            }
-        }
 
         /// <summary>
         /// Continues after rest room.

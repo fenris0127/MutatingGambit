@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using UnityEngine;
-using MutatingGambit.Systems.Board;
+using MutatingGambit.Systems.BoardSystem;
 
 namespace MutatingGambit.Tests
 {

@@ -15,7 +15,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <EnableDefaultItems>false</EnableDefaultItems>
     <LangVersion>9.0</LangVersion>
-    <RootNamespace>MutatingGambit.Core</RootNamespace>
+    <RootNamespace>MutatingGambit</RootNamespace>
     <OutputType>Library</OutputType>
     <AssemblyName>MutatingGambit.Core</AssemblyName>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -42,61 +42,114 @@
     <UnityVersion>6000.2.10f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Analyzer Include="C:\Users\김민재\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.1.3\Analyzers\Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="C:\Users\김민재\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.2.0\Analyzers\Microsoft.Unity.Analyzers.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.2.10f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.2.10f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.2.10f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Movement\RookMoveRule.cs" />
-    <Compile Include="Assets\Scripts\Mutations\SplittingKnightMutation.cs" />
-    <Compile Include="Assets\Scripts\Artifacts\Artifact.cs" />
-    <Compile Include="Assets\Scripts\Core\Piece.cs" />
-    <Compile Include="Assets\Scripts\Artifacts\KingsShadowArtifact.cs" />
-    <Compile Include="Assets\Scripts\Victory\IVictoryCondition.cs" />
-    <Compile Include="Assets\Scripts\Movement\QueenMoveRule.cs" />
-    <Compile Include="Assets\Scripts\Artifacts\CavalryChargeArtifact.cs" />
-    <Compile Include="Assets\Scripts\Mutations\Mutation.cs" />
-    <Compile Include="Assets\Scripts\Movement\BishopMoveRule.cs" />
-    <Compile Include="Assets\Scripts\Rooms\Room.cs" />
-    <Compile Include="Assets\Scripts\AI\Difficulty.cs" />
-    <Compile Include="Assets\Scripts\Mutations\LeapingRookMutation.cs" />
-    <Compile Include="Assets\Scripts\Movement\MoveValidator.cs" />
-    <Compile Include="Assets\Scripts\Core\Position.cs" />
-    <Compile Include="Assets\Scripts\Movement\KingMoveRule.cs" />
-    <Compile Include="Assets\Scripts\Mutations\GlassBishopMutation.cs" />
-    <Compile Include="Assets\Scripts\Movement\PawnMoveRule.cs" />
-    <Compile Include="Assets\Scripts\Core\PieceColor.cs" />
-    <Compile Include="Assets\Scripts\Core\PositionCache.cs" />
-    <Compile Include="Assets\Scripts\Rooms\RoomType.cs" />
-    <Compile Include="Assets\Scripts\Movement\MoveRuleFactory.cs" />
-    <Compile Include="Assets\Scripts\Rooms\RoomReward.cs" />
-    <Compile Include="Assets\Scripts\Meta\MetaProgression.cs" />
-    <Compile Include="Assets\Scripts\Victory\KingToPositionCondition.cs" />
-    <Compile Include="Assets\Scripts\Core\PieceType.cs" />
-    <Compile Include="Assets\Scripts\Artifacts\ArtifactContext.cs" />
-    <Compile Include="Assets\Scripts\Movement\KnightMoveRule.cs" />
-    <Compile Include="Assets\Scripts\Core\TileType.cs" />
+    <Compile Include="Assets\Scripts\Systems\Artifacts\CavalryChargeArtifact.cs" />
+    <Compile Include="Assets\Scripts\Core\MovementRules\KnightJumpRule.cs" />
+    <Compile Include="Assets\Scripts\Core\MovementRules\KingStepRule.cs" />
+    <Compile Include="Assets\Scripts\Systems\Dungeon\RoomManager.cs" />
+    <Compile Include="Assets\Scripts\Systems\Dungeon\VictoryCondition.cs" />
+    <Compile Include="Assets\Scripts\Systems\Dungeon\RoomType.cs" />
+    <Compile Include="Assets\Scripts\UI\MutationDisplay.cs" />
+    <Compile Include="Assets\Scripts\Core\ChessEngine\BoardInputHandler.cs" />
+    <Compile Include="Assets\Scripts\Systems\Mutations\InitialMutations\ExplosiveKingMutation.cs" />
+    <Compile Include="Assets\Scripts\UI\GameOverScreen.cs" />
+    <Compile Include="Assets\Scripts\Systems\PieceManagement\RepairSystem.cs" />
+    <Compile Include="Assets\Scripts\AI\AIConfig.cs" />
+    <Compile Include="Assets\Scripts\Systems\Dungeon\BossData.cs" />
+    <Compile Include="Assets\Scripts\Systems\Tutorial\TutorialStep.cs" />
+    <Compile Include="Assets\Scripts\Systems\Dungeon\RoomNode.cs" />
+    <Compile Include="Assets\Scripts\Systems\Artifacts\Artifact.cs" />
+    <Compile Include="Assets\Scripts\Systems\Artifacts\ArtifactHelpers.cs" />
+    <Compile Include="Assets\Scripts\Systems\Artifacts\BloodMoonArtifact.cs" />
+    <Compile Include="Assets\Scripts\Core\MovementRules\DiagonalRule.cs" />
+    <Compile Include="Assets\Scripts\Systems\Testing\BalanceTestManager.cs" />
+    <Compile Include="Assets\Scripts\Systems\Mutations\MutationHelpers.cs" />
+    <Compile Include="Assets\Scripts\UI\RunHistoryUI.cs" />
+    <Compile Include="Assets\Scripts\Core\ChessEngine\PieceType.cs" />
+    <Compile Include="Assets\Scripts\Systems\Mutations\InitialMutations\FragileBishopMutation.cs" />
+    <Compile Include="Assets\Scripts\Systems\Mutations\InitialMutations\PhantomPawnMutation.cs" />
+    <Compile Include="Assets\Scripts\UI\TurnIndicator.cs" />
+    <Compile Include="Assets\Scripts\Core\ChessEngine\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Systems\Mutations\InitialMutations\ShadowPawnMutation.cs" />
+    <Compile Include="Assets\Scripts\UI\ArtifactSlot.cs" />
+    <Compile Include="Assets\Scripts\Systems\Dungeon\CheckmateInNMovesCondition.cs" />
+    <Compile Include="Assets\Scripts\Core\MovementRules\StraightLineRule.cs" />
+    <Compile Include="Assets\Scripts\UI\TutorialUI.cs" />
+    <Compile Include="Assets\Scripts\AI\MoveEvaluator.cs" />
+    <Compile Include="Assets\Scripts\Systems\Mutations\InitialMutations\SplittingKnightMutation.cs" />
+    <Compile Include="Assets\Scripts\UI\RepairUI.cs" />
+    <Compile Include="Assets\Scripts\Systems\Dungeon\PlayerState.cs" />
+    <Compile Include="Assets\Scripts\Core\MovementRules\MovementRule.cs" />
+    <Compile Include="Assets\Scripts\Systems\SaveLoad\RunRecord.cs" />
+    <Compile Include="Assets\Scripts\Systems\Board\Tile.cs" />
+    <Compile Include="Assets\Scripts\Systems\Dungeon\RoomData.cs" />
+    <Compile Include="Assets\Scripts\Systems\Artifacts\TimeWarpArtifact.cs" />
+    <Compile Include="Assets\Scripts\Systems\Audio\AudioConfig.cs" />
+    <Compile Include="Assets\Scripts\Systems\Mutations\MutationLibrary.cs" />
+    <Compile Include="Assets\Scripts\UI\TooltipManager.cs" />
+    <Compile Include="Assets\Scripts\Systems\Artifacts\KingsShadowArtifact.cs" />
+    <Compile Include="Assets\Scripts\Systems\Mutations\InitialMutations\TeleportingKnightMutation.cs" />
+    <Compile Include="Assets\Scripts\Systems\Dungeon\RewardData.cs" />
+    <Compile Include="Assets\Scripts\Systems\Artifacts\RemainingArtifacts.cs" />
+    <Compile Include="Assets\Scripts\Systems\Dungeon\DungeonManager.cs" />
+    <Compile Include="Assets\Scripts\Systems\Artifacts\AdvancedArtifacts.cs" />
+    <Compile Include="Assets\Scripts\Editor\TutorialContentGenerator.cs" />
+    <Compile Include="Assets\Scripts\Systems\Mutations\AdvancedMutations.cs" />
+    <Compile Include="Assets\Scripts\UI\PauseMenu.cs" />
+    <Compile Include="Assets\Scripts\UI\MoveHistoryEntry.cs" />
+    <Compile Include="Assets\Scripts\Systems\Tutorial\TutorialManager.cs" />
+    <Compile Include="Assets\Scripts\Core\MovementRules\BackwardPawnRule.cs" />
     <Compile Include="Assets\Scripts\AI\ChessAI.cs" />
-    <Compile Include="Assets\Scripts\Victory\CheckmateInNMovesCondition.cs" />
-    <Compile Include="Assets\Scripts\UI\DisplayFormatter.cs" />
-    <Compile Include="Assets\Scripts\Core\Tile.cs" />
-    <Compile Include="Assets\Scripts\UI\GameStateDisplay.cs" />
-    <Compile Include="Assets\Scripts\UI\InputHandler.cs" />
-    <Compile Include="Assets\Scripts\Core\Board.cs" />
-    <Compile Include="Assets\Scripts\Rooms\TreasureRoom.cs" />
-    <Compile Include="Assets\Scripts\Victory\CompositeVictoryCondition.cs" />
-    <Compile Include="Assets\Scripts\Artifacts\PromotionPrivilegeArtifact.cs" />
-    <Compile Include="Assets\Scripts\AI\AIMove.cs" />
-    <Compile Include="Assets\Scripts\Victory\CaptureSpecificPieceCondition.cs" />
-    <Compile Include="Assets\Scripts\Movement\NullMoveRule.cs" />
-    <Compile Include="Assets\Scripts\UI\BoardDisplay.cs" />
-    <Compile Include="Assets\Scripts\Rooms\CombatRoom.cs" />
-    <Compile Include="Assets\Scripts\Rooms\RestRoom.cs" />
-    <Compile Include="Assets\Scripts\Map\DungeonMap.cs" />
-    <Compile Include="Assets\Scripts\Map\MapNode.cs" />
-    <Compile Include="Assets\Scripts\Movement\IMoveRule.cs" />
-    <Compile Include="Assets\Scripts\Artifacts\ArtifactManager.cs" />
+    <Compile Include="Assets\Scripts\Systems\SaveLoad\SaveManager.cs" />
+    <Compile Include="Assets\Scripts\UI\BossIntroUI.cs" />
+    <Compile Include="Assets\Scripts\UI\RewardSelectionUI.cs" />
+    <Compile Include="Assets\Scripts\Systems\PieceManagement\PieceHealth.cs" />
+    <Compile Include="Assets\Scripts\Systems\Mutations\InitialMutations\DoubleMoveRookMutation.cs" />
+    <Compile Include="Assets\Scripts\Systems\Effects\EffectManager.cs" />
+    <Compile Include="Assets\Scripts\Systems\SaveLoad\SaveData.cs" />
+    <Compile Include="Assets\Scripts\Editor\BalanceTestWindow.cs" />
+    <Compile Include="Assets\Scripts\Systems\Audio\AudioManager.cs" />
+    <Compile Include="Assets\Scripts\AI\BossAI.cs" />
+    <Compile Include="Assets\Scripts\UI\DungeonMapUI.cs" />
+    <Compile Include="Assets\Scripts\Core\ChessEngine\Board.cs" />
+    <Compile Include="Assets\Scripts\Core\ChessEngine\Team.cs" />
+    <Compile Include="Assets\Scripts\Systems\Artifacts\PhoenixFeatherArtifact.cs" />
+    <Compile Include="Assets\Scripts\Systems\Dungeon\DungeonMapGenerator.cs" />
+    <Compile Include="Assets\Scripts\Systems\Artifacts\GravityMirrorArtifact.cs" />
+    <Compile Include="Assets\Scripts\Visual\PieceVisualizer.cs" />
+    <Compile Include="Assets\Scripts\Systems\Board\TileType.cs" />
+    <Compile Include="Assets\Scripts\Systems\Artifacts\ArtifactLibrary.cs" />
+    <Compile Include="Assets\Scripts\Systems\SaveLoad\GlobalDataManager.cs" />
+    <Compile Include="Assets\Scripts\AI\StateEvaluator.cs" />
+    <Compile Include="Assets\Scripts\Systems\Mutations\MutationManager.cs" />
+    <Compile Include="Assets\Scripts\Systems\Artifacts\AdditionalArtifacts.cs" />
+    <Compile Include="Assets\Scripts\UI\MainMenuUI.cs" />
+    <Compile Include="Assets\Scripts\UI\MutationPanel.cs" />
+    <Compile Include="Assets\Scripts\Systems\Artifacts\ArtifactManager.cs" />
+    <Compile Include="Assets\Scripts\Systems\Board\BoardData.cs" />
+    <Compile Include="Assets\Scripts\Systems\Mutations\InitialMutations\FrozenBishopMutation.cs" />
+    <Compile Include="Assets\Scripts\UI\MoveHistoryPanel.cs" />
+    <Compile Include="Assets\Scripts\Editor\ContentGenerator.cs" />
+    <Compile Include="Assets\Scripts\UI\ArtifactPanel.cs" />
+    <Compile Include="Assets\Scripts\UI\CodexUI.cs" />
+    <Compile Include="Assets\Scripts\Editor\MVPAssetCreator.cs" />
+    <Compile Include="Assets\Scripts\Visual\PieceMutationIndicator.cs" />
+    <Compile Include="Assets\Scripts\Systems\Mutations\Mutation.cs" />
+    <Compile Include="Assets\Scripts\Systems\Mutations\InitialMutations\BerserkQueenMutation.cs" />
+    <Compile Include="Assets\Scripts\Core\ChessEngine\Piece.cs" />
+    <Compile Include="Assets\Scripts\Systems\Artifacts\MagneticFieldArtifact.cs" />
+    <Compile Include="Assets\Scripts\Systems\Mutations\InitialMutations\LeapingRookMutation.cs" />
+    <Compile Include="Assets\Scripts\Systems\Dungeon\CaptureSpecificPieceCondition.cs" />
+    <Compile Include="Assets\Scripts\Systems\PieceManagement\PieceUpgrade.cs" />
+    <Compile Include="Assets\Scripts\Systems\Board\BoardGenerator.cs" />
+    <Compile Include="Assets\Scripts\Core\ChessEngine\BoardPosition.cs" />
+    <Compile Include="Assets\Scripts\UI\BrokenPieceIndicator.cs" />
+    <Compile Include="Assets\Scripts\Core\ChessEngine\MoveValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Scripts\MutatingGambit.Core.asmdef" />
@@ -1208,6 +1261,10 @@
     </Reference>
     <Reference Include="System.Xml.Serialization">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.10f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">

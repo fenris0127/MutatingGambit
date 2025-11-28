@@ -158,10 +158,10 @@ namespace MutatingGambit.Systems.Dungeon
             // Save broken pieces
             if (repairSystem != null)
             {
-                var brokenPiecesList = repairSystem.GetBrokenPieces(playerTeam);
+                var brokenPiecesList = repairSystem.BrokenPieces;
                 foreach (var pieceHealth in brokenPiecesList)
                 {
-                    if (pieceHealth != null && pieceHealth.Piece != null)
+                    if (pieceHealth != null && pieceHealth.Piece != null && pieceHealth.Piece.Team == playerTeam)
                     {
                         brokenPieces.Add(new PieceStateData(pieceHealth.Piece));
                     }
@@ -200,8 +200,11 @@ namespace MutatingGambit.Systems.Dungeon
                     Piece piece = CreatePieceFromData(pieceData, piecePrefab);
                     if (piece != null)
                     {
-                        var pieceHealth = piece.gameObject.AddComponent<PieceHealth>();
-                        pieceHealth.Initialize(piece);
+                        var pieceHealth = piece.gameObject.GetComponent<PieceHealth>();
+                        if (pieceHealth == null)
+                        {
+                            pieceHealth = piece.gameObject.AddComponent<PieceHealth>();
+                        }
                         repairSystem.BreakPiece(pieceHealth);
                     }
                 }

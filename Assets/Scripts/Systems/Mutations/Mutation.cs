@@ -33,8 +33,6 @@ namespace MutatingGambit.Systems.Mutations
         Chaos
     }
 
-namespace MutatingGambit.Systems.Mutations
-{
     /// <summary>
     /// Abstract base class for piece mutations.
     /// Mutations modify how pieces move and behave by adding/removing/modifying movement rules.

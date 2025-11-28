@@ -1,7 +1,7 @@
 using UnityEngine;
 using MutatingGambit.Core.ChessEngine;
 
-namespace MutatingGambit.Systems.Board
+namespace MutatingGambit.Systems.BoardSystem
 {
     /// <summary>
     /// Generates and manages the visual board from BoardData.
