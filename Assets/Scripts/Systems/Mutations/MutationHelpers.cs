@@ -22,10 +22,9 @@ namespace MutatingGambit.Systems.Mutations
         /// <summary>
         /// Gets all mutations of a specific rarity from all pieces.
         /// </summary>
-        public static List<Mutation> GetMutationsByRarity(this MutationManager manager, MutationRarity rarity)
+        public static List<Mutation> GetMutationsByRarity(this MutationManager manager, Board board, MutationRarity rarity)
         {
             var result = new List<Mutation>();
-            var board = Object.FindObjectOfType<Board>();
             if (board != null)
             {
                 var allPieces = board.GetAllPieces();
@@ -41,10 +40,9 @@ namespace MutatingGambit.Systems.Mutations
         /// <summary>
         /// Gets all mutations with a specific tag.
         /// </summary>
-        public static List<Mutation> GetMutationsByTag(this MutationManager manager, MutationTag tag)
+        public static List<Mutation> GetMutationsByTag(this MutationManager manager, Board board, MutationTag tag)
         {
             var result = new List<Mutation>();
-            var board = Object.FindObjectOfType<Board>();
             if (board != null)
             {
                 var allPieces = board.GetAllPieces();
@@ -76,10 +74,9 @@ namespace MutatingGambit.Systems.Mutations
         /// <summary>
         /// Gets the total count of a specific mutation tag across all pieces.
         /// </summary>
-        public static int GetTagCount(this MutationManager manager, MutationTag tag, Team team)
+        public static int GetTagCount(this MutationManager manager, Board board, MutationTag tag, Team team)
         {
             int count = 0;
-            var board = Object.FindObjectOfType<Board>();
             if (board != null)
             {
                 var teamPieces = board.GetPiecesByTeam(team);

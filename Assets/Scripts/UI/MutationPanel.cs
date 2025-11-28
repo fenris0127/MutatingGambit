@@ -20,6 +20,8 @@ namespace MutatingGambit.UI
         private Transform contentContainer;
         [SerializeField]
         private TextMeshProUGUI titleText;
+        [SerializeField]
+        private Board board;
 
         [Header("Settings")]
         [SerializeField]
@@ -32,6 +34,12 @@ namespace MutatingGambit.UI
 
         private void Start()
         {
+            // Cache board reference if not assigned
+            if (board == null)
+            {
+                board = FindObjectOfType<Board>();
+            }
+
             if (titleText != null)
             {
                 titleText.text = "Active Mutations";
@@ -56,26 +64,22 @@ namespace MutatingGambit.UI
             // Clear existing cards
             ClearCards();
 
-            if (MutationManager.Instance == null)
+            if (MutationManager.Instance == null || board == null)
             {
                 return;
             }
 
             // Get all unique mutations from all pieces
             HashSet<Mutation> uniqueMutations = new HashSet<Mutation>();
-            var board = FindObjectOfType<Board>();
-            if (board != null)
+            var allPieces = board.GetAllPieces();
+            foreach (var piece in allPieces)
             {
-                var allPieces = board.GetAllPieces();
-                foreach (var piece in allPieces)
+                if (piece != null && piece.Team == Team.White) // Assuming player is White
                 {
-                    if (piece != null && piece.Team == Team.White) // Assuming player is White
+                    var mutations = MutationManager.Instance.GetMutations(piece);
+                    foreach (var mutation in mutations)
                     {
-                        var mutations = MutationManager.Instance.GetMutations(piece);
-                        foreach (var mutation in mutations)
-                        {
-                            uniqueMutations.Add(mutation);
-                        }
+                        uniqueMutations.Add(mutation);
                     }
                 }
             }
@@ -189,22 +193,17 @@ namespace MutatingGambit.UI
         // Tooltip support
         public void OnPointerEnter()
         {
-            if (mutation != null)
+            if (mutation != null && TooltipManager.Instance != null)
             {
-                TooltipManager tooltipManager = FindObjectOfType<TooltipManager>();
-                if (tooltipManager != null)
-                {
-                    tooltipManager.ShowTooltip(mutation.MutationName, mutation.Description);
-                }
+                TooltipManager.Instance.ShowTooltip(mutation.MutationName, mutation.Description);
             }
         }
 
         public void OnPointerExit()
         {
-            TooltipManager tooltipManager = FindObjectOfType<TooltipManager>();
-            if (tooltipManager != null)
+            if (TooltipManager.Instance != null)
             {
-                tooltipManager.HideTooltip();
+                TooltipManager.Instance.HideTooltip();
             }
         }
     }

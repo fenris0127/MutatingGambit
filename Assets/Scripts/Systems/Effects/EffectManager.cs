@@ -18,13 +18,18 @@ namespace MutatingGambit.Systems.Effects
         [SerializeField]
         private GameObject victoryEffectPrefab;
 
+        [Header("References")]
+        [SerializeField]
         private Board board;
+
+        [SerializeField]
         private GameManager gameManager;
 
         private void Start()
         {
-            board = FindObjectOfType<Board>();
-            gameManager = FindObjectOfType<GameManager>();
+            // Cache references if not assigned
+            if (board == null) board = FindObjectOfType<Board>();
+            if (gameManager == null) gameManager = GameManager.Instance;
 
             if (board != null)
             {

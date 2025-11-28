@@ -94,7 +94,7 @@ namespace MutatingGambit.Core.ChessEngine
             movementRules.Clear();
             
             // Add Queen rules using factory to prevent memory leaks
-            var factory = MovementRules.MovementRuleFactory.Instance;
+            var factory = MovementRuleFactory.Instance;
             var queenRules = factory.GetQueenRules();
             foreach (var rule in queenRules)
             {
@@ -165,7 +165,19 @@ namespace MutatingGambit.Core.ChessEngine
         /// </summary>
         public override string ToString()
         {
-            return $"{team} {pieceType} at {position.ToNotation()}";
+            return $"{team} {pieceType} at {BoardPosition.ToNotation(position)}";
+        }
+
+        /// <summary>
+        /// Cleanup when piece is destroyed to prevent memory leaks.
+        /// </summary>
+        private void OnDestroy()
+        {
+            // Unregister from MutationManager to prevent memory leaks
+            if (Systems.Mutations.MutationManager.Instance != null)
+            {
+                Systems.Mutations.MutationManager.Instance.UnregisterPiece(this);
+            }
         }
     }
 }

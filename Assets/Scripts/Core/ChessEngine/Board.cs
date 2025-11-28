@@ -137,13 +137,26 @@ namespace MutatingGambit.Core.ChessEngine
         {
             if (IsPositionValid(position))
             {
-                obstacles[position.x, position.y] = isObstacle;
-            }
+            obstacles[position.x, position.y] = isObstacle;
+        }
+    }
+
+    /// <summary>
+    /// Checks if a position has an obstacle.
+    /// </summary>
+    public bool HasObstacle(Vector2Int position)
+    {
+        if (!IsPositionValid(position))
+        {
+            return false;
         }
 
-        /// <summary>
-        /// Spawns a new piece on the board.
-        /// </summary>
+        return obstacles[position.x, position.y];
+    }
+
+    /// <summary>
+    /// Spawns a new piece on the board.
+    /// </summary>
         public Piece SpawnPiece(PieceType type, Team team, Vector2Int position)
         {
             GameObject pieceObject;
@@ -300,7 +313,9 @@ namespace MutatingGambit.Core.ChessEngine
 
         /// <summary>
         /// Creates a deep copy of the board for AI simulation.
+        /// WARNING: This method creates GameObjects which is slow. Use CloneAsState() for AI instead.
         /// </summary>
+        [System.Obsolete("Use CloneAsState() for better performance in AI simulations")]
         public Board Clone()
         {
             GameObject clonedObject = new GameObject("ClonedBoard");
@@ -336,6 +351,15 @@ namespace MutatingGambit.Core.ChessEngine
             }
 
             return clonedBoard;
+        }
+
+        /// <summary>
+        /// Creates a lightweight board state for AI simulation without GameObject overhead.
+        /// This is significantly faster than Clone() for AI move evaluation.
+        /// </summary>
+        public BoardState CloneAsState()
+        {
+            return BoardState.FromBoard(this);
         }
 
         /// <summary>

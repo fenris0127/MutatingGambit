@@ -110,7 +110,7 @@ namespace MutatingGambit.Systems.Mutations.Advanced
         {
         }
 
-        public override void OnCapture(Piece mutatedPiece, Piece capturedPiece, Board board)
+        public override void OnCapture(Piece mutatedPiece, Piece capturedPiece, Vector2Int fromPos, Vector2Int toPos, Board board)
         {
             // Deal splash damage to adjacent pieces
             Vector2Int capturePos = capturedPiece.Position;
@@ -167,7 +167,7 @@ namespace MutatingGambit.Systems.Mutations.Advanced
             captureCount = 0;
         }
 
-        public override void OnCapture(Piece mutatedPiece, Piece capturedPiece, Board board)
+        public override void OnCapture(Piece mutatedPiece, Piece capturedPiece, Vector2Int fromPos, Vector2Int toPos, Board board)
         {
             captureCount++;
             // Extend movement range (would need custom rule modification)
@@ -282,7 +282,7 @@ namespace MutatingGambit.Systems.Mutations.Advanced
             captureCount = 0;
         }
 
-        public override void OnCapture(Piece mutatedPiece, Piece capturedPiece, Board board)
+        public override void OnCapture(Piece mutatedPiece, Piece capturedPiece, Vector2Int fromPos, Vector2Int toPos, Board board)
         {
             captureCount++;
             if (captureCount >= 3)

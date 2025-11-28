@@ -20,8 +20,8 @@ namespace MutatingGambit.Systems.Artifacts
                 return;
             }
 
-            // Find repair system
-            var repairSystem = Object.FindObjectOfType<RepairSystem>();
+            // Get repair system from context
+            var repairSystem = context.RepairSystem as RepairSystem;
 
             if (repairSystem != null && repairSystem.BrokenPieceCount > 0)
             {

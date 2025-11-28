@@ -9,8 +9,32 @@ namespace MutatingGambit.Systems.Artifacts
     /// </summary>
     public class ArtifactManager : MonoBehaviour
     {
+        private static ArtifactManager instance;
+
+        public static ArtifactManager Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = FindFirstObjectByType<ArtifactManager>();
+                }
+                return instance;
+            }
+        }
+
         private List<Artifact> activeArtifacts = new List<Artifact>();
         private Board currentBoard;
+
+        private void Awake()
+        {
+            if (instance != null && instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            instance = this;
+        }
 
         /// <summary>
         /// Gets all currently active artifacts.

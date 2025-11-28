@@ -57,6 +57,41 @@ namespace MutatingGambit.AI
         }
 
         /// <summary>
+        /// Evaluates a lightweight BoardState (optimized for AI simulation).
+        /// Positive score = good for AI, negative = good for opponent.
+        /// </summary>
+        public float EvaluateBoardState(BoardState state)
+        {
+            if (state == null)
+            {
+                return 0f;
+            }
+
+            float score = 0f;
+
+            // Material evaluation
+            score += EvaluateMaterialState(state) * config.MaterialWeight;
+
+            // Positional evaluation
+            score += EvaluatePositionState(state) * config.PositionalWeight;
+
+            // King safety
+            score += EvaluateKingSafetyState(state) * config.KingSafetyWeight;
+
+            // Mobility (number of valid moves)
+            score += EvaluateMobilityState(state) * config.MobilityWeight;
+
+            // Add randomness to prevent deterministic play
+            if (config.RandomnessFactor > 0)
+            {
+                float randomness = ((float)random.NextDouble() - 0.5f) * 2f * config.RandomnessFactor;
+                score += randomness;
+            }
+
+            return score;
+        }
+
+        /// <summary>
         /// Evaluates material advantage (piece values).
         /// </summary>
         private float EvaluateMaterial(Board board)
@@ -273,6 +308,202 @@ namespace MutatingGambit.AI
             foreach (var piece in pieces)
             {
                 var moves = MoveValidator.GetValidMoves(board, piece.Position);
+                totalMoves += moves.Count;
+            }
+
+            return totalMoves;
+        }
+
+        // ========== BoardState Evaluation Methods (Optimized for AI) ==========
+
+        /// <summary>
+        /// Evaluates material advantage from BoardState.
+        /// </summary>
+        private float EvaluateMaterialState(BoardState state)
+        {
+            float aiMaterial = 0f;
+            float opponentMaterial = 0f;
+
+            Team opponentTeam = aiTeam == Team.White ? Team.Black : Team.White;
+
+            var aiPieces = state.GetPiecesByTeam(aiTeam);
+            var opponentPieces = state.GetPiecesByTeam(opponentTeam);
+
+            foreach (var pieceData in aiPieces)
+            {
+                aiMaterial += config.GetPieceValue(pieceData.Type);
+            }
+
+            foreach (var pieceData in opponentPieces)
+            {
+                opponentMaterial += config.GetPieceValue(pieceData.Type);
+            }
+
+            return aiMaterial - opponentMaterial;
+        }
+
+        /// <summary>
+        /// Evaluates positional advantage from BoardState.
+        /// </summary>
+        private float EvaluatePositionState(BoardState state)
+        {
+            float score = 0f;
+
+            // Center control bonus
+            Vector2Int[] centerSquares = new Vector2Int[]
+            {
+                new Vector2Int(state.Width / 2 - 1, state.Height / 2 - 1),
+                new Vector2Int(state.Width / 2, state.Height / 2 - 1),
+                new Vector2Int(state.Width / 2 - 1, state.Height / 2),
+                new Vector2Int(state.Width / 2, state.Height / 2)
+            };
+
+            foreach (var square in centerSquares)
+            {
+                if (!state.IsPositionValid(square))
+                {
+                    continue;
+                }
+
+                var pieceData = state.GetPieceData(square);
+                if (pieceData != null)
+                {
+                    if (pieceData.Team == aiTeam)
+                    {
+                        score += 0.5f;
+                    }
+                    else
+                    {
+                        score -= 0.5f;
+                    }
+                }
+            }
+
+            // Piece development (not on back rank)
+            var aiPieces = state.GetPiecesByTeam(aiTeam);
+            Team opponentTeam = aiTeam == Team.White ? Team.Black : Team.White;
+            var opponentPieces = state.GetPiecesByTeam(opponentTeam);
+
+            int aiBackRank = aiTeam == Team.White ? 0 : state.Height - 1;
+            int opponentBackRank = opponentTeam == Team.White ? 0 : state.Height - 1;
+
+            foreach (var pieceData in aiPieces)
+            {
+                if (pieceData.Type != PieceType.King && pieceData.Position.y != aiBackRank)
+                {
+                    score += 0.1f;
+                }
+            }
+
+            foreach (var pieceData in opponentPieces)
+            {
+                if (pieceData.Type != PieceType.King && pieceData.Position.y != opponentBackRank)
+                {
+                    score -= 0.1f;
+                }
+            }
+
+            return score;
+        }
+
+        /// <summary>
+        /// Evaluates king safety from BoardState.
+        /// </summary>
+        private float EvaluateKingSafetyState(BoardState state)
+        {
+            float score = 0f;
+
+            // Find kings
+            BoardState.PieceData aiKing = FindKingInState(state, aiTeam);
+            Team opponentTeam = aiTeam == Team.White ? Team.Black : Team.White;
+            BoardState.PieceData opponentKing = FindKingInState(state, opponentTeam);
+
+            if (aiKing != null)
+            {
+                // AI king is safer if it has friendly pieces nearby
+                int friendlyNeighbors = CountFriendlyNeighborsState(state, aiKing.Position, aiTeam);
+                score += friendlyNeighbors * 0.3f;
+            }
+
+            if (opponentKing != null)
+            {
+                int opponentFriendlyNeighbors = CountFriendlyNeighborsState(state, opponentKing.Position, opponentTeam);
+                score -= opponentFriendlyNeighbors * 0.3f;
+            }
+
+            return score;
+        }
+
+        /// <summary>
+        /// Evaluates mobility from BoardState.
+        /// </summary>
+        private float EvaluateMobilityState(BoardState state)
+        {
+            Team opponentTeam = aiTeam == Team.White ? Team.Black : Team.White;
+
+            int aiMoves = CountTotalMovesState(state, aiTeam);
+            int opponentMoves = CountTotalMovesState(state, opponentTeam);
+
+            return (aiMoves - opponentMoves) * 0.1f;
+        }
+
+        /// <summary>
+        /// Finds the king in BoardState.
+        /// </summary>
+        private BoardState.PieceData FindKingInState(BoardState state, Team team)
+        {
+            var pieces = state.GetPiecesByTeam(team);
+            foreach (var pieceData in pieces)
+            {
+                if (pieceData.Type == PieceType.King)
+                {
+                    return pieceData;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Counts friendly pieces adjacent to a position in BoardState.
+        /// </summary>
+        private int CountFriendlyNeighborsState(BoardState state, Vector2Int position, Team team)
+        {
+            int count = 0;
+            Vector2Int[] neighbors = new Vector2Int[]
+            {
+                new Vector2Int(0, 1), new Vector2Int(0, -1),
+                new Vector2Int(1, 0), new Vector2Int(-1, 0),
+                new Vector2Int(1, 1), new Vector2Int(1, -1),
+                new Vector2Int(-1, 1), new Vector2Int(-1, -1)
+            };
+
+            foreach (var offset in neighbors)
+            {
+                Vector2Int checkPos = position + offset;
+                if (state.IsPositionValid(checkPos))
+                {
+                    var pieceData = state.GetPieceData(checkPos);
+                    if (pieceData != null && pieceData.Team == team && pieceData.Type != PieceType.King)
+                    {
+                        count++;
+                    }
+                }
+            }
+
+            return count;
+        }
+
+        /// <summary>
+        /// Counts total number of valid moves for a team in BoardState.
+        /// </summary>
+        private int CountTotalMovesState(BoardState state, Team team)
+        {
+            int totalMoves = 0;
+            var pieces = state.GetPiecesByTeam(team);
+
+            foreach (var pieceData in pieces)
+            {
+                var moves = state.GetValidMoves(pieceData);
                 totalMoves += moves.Count;
             }
 

@@ -160,23 +160,18 @@ namespace MutatingGambit.Visual
         // Could add tooltip on mouse hover
         private void OnMouseEnter()
         {
-            if (mutation != null)
+            if (mutation != null && UI.TooltipManager.Instance != null)
             {
                 // Show tooltip with mutation name and description
-                var tooltipManager = FindObjectOfType<UI.TooltipManager>();
-                if (tooltipManager != null)
-                {
-                    tooltipManager.ShowTooltip(mutation.MutationName, mutation.Description);
-                }
+                UI.TooltipManager.Instance.ShowTooltip(mutation.MutationName, mutation.Description);
             }
         }
 
         private void OnMouseExit()
         {
-            var tooltipManager = FindObjectOfType<UI.TooltipManager>();
-            if (tooltipManager != null)
+            if (UI.TooltipManager.Instance != null)
             {
-                tooltipManager.HideTooltip();
+                UI.TooltipManager.Instance.HideTooltip();
             }
         }
     }

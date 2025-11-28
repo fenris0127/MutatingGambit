@@ -193,6 +193,12 @@ namespace MutatingGambit.Systems.Mutations
             }
 
             pieceMutations[piece].Clear();
+
+            // Also clear mutation stacks to prevent memory leaks
+            if (mutationStacks.ContainsKey(piece))
+            {
+                mutationStacks[piece].Clear();
+            }
         }
 
         /// <summary>
@@ -266,7 +272,41 @@ namespace MutatingGambit.Systems.Mutations
         /// </summary>
         public void Reset()
         {
+            // Clear all mutations from all pieces
+            foreach (var kvp in pieceMutations)
+            {
+                var piece = kvp.Key;
+                var mutations = new List<Mutation>(kvp.Value);
+                foreach (var mutation in mutations)
+                {
+                    if (mutation != null && piece != null)
+                    {
+                        mutation.RemoveFromPiece(piece);
+                    }
+                }
+            }
+
             pieceMutations.Clear();
+            mutationStacks.Clear();
+        }
+
+        /// <summary>
+        /// Removes a piece from tracking when it's destroyed.
+        /// Call this when a piece is destroyed to prevent memory leaks.
+        /// </summary>
+        public void UnregisterPiece(Piece piece)
+        {
+            if (piece == null)
+            {
+                return;
+            }
+
+            // Remove all mutations first
+            ClearMutations(piece);
+
+            // Remove from dictionaries
+            pieceMutations.Remove(piece);
+            mutationStacks.Remove(piece);
         }
 
         private void OnDestroy()

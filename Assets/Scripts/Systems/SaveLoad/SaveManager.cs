@@ -49,7 +49,7 @@ namespace MutatingGambit.Systems.SaveLoad
                 // Save Dungeon State
                 data.CurrentFloor = dungeonManager.CurrentFloor;
                 data.CurrentRoomIndex = dungeonManager.CurrentRoomIndex;
-                // Seed saving would go here if implemented
+                data.DungeonSeed = dungeonManager.Seed;
             }
 
             // 2. Save Player State
@@ -59,12 +59,16 @@ namespace MutatingGambit.Systems.SaveLoad
             // Actually, PlayerState is usually passed around. Let's try to find the active pieces on the board.
             
             var board = FindFirstObjectByType<Board>();
+            var gameManager = GameManager.Instance;
+            Team playerTeam = gameManager != null ? gameManager.PlayerTeam : Team.White;
+
             if (board != null)
             {
                 data.PlayerData = new PlayerSaveData();
+                data.PlayerData.PlayerTeam = playerTeam;
                 data.PlayerData.Pieces = new List<PieceSaveData>();
 
-                var playerPieces = board.GetPiecesByTeam(Team.White); // Assuming player is White
+                var playerPieces = board.GetPiecesByTeam(playerTeam);
                 foreach (var piece in playerPieces)
                 {
                     var pieceData = new PieceSaveData
@@ -190,6 +194,8 @@ namespace MutatingGambit.Systems.SaveLoad
             board.Clear();
 
             // 2. Restore Pieces
+            Team playerTeam = data.PlayerData != null ? data.PlayerData.PlayerTeam : Team.White;
+
             if (data.PlayerData != null && data.PlayerData.Pieces != null)
             {
                 foreach (var pieceData in data.PlayerData.Pieces)
@@ -198,7 +204,7 @@ namespace MutatingGambit.Systems.SaveLoad
                     {
                         // Create piece
                         // Use Board's SpawnPiece method
-                        var piece = board.SpawnPiece(pieceData.Type, Team.White, pieceData.Position);
+                        var piece = board.SpawnPiece(pieceData.Type, playerTeam, pieceData.Position);
                         
                         // Apply mutations
                         if (piece != null && pieceData.MutationNames != null)

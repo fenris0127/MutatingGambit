@@ -17,13 +17,17 @@ namespace MutatingGambit.Systems.Audio
         [SerializeField]
         private AudioSource musicSource;
 
+        [SerializeField]
         private Board board;
+
+        [SerializeField]
         private GameManager gameManager;
 
         private void Start()
         {
-            board = FindObjectOfType<Board>();
-            gameManager = FindObjectOfType<GameManager>();
+            // Cache references if not assigned
+            if (board == null) board = FindObjectOfType<Board>();
+            if (gameManager == null) gameManager = GameManager.Instance;
 
             if (board != null)
             {

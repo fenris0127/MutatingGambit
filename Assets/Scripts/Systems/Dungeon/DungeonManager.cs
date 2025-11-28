@@ -120,6 +120,21 @@ namespace MutatingGambit.Systems.Dungeon
             }
         }
 
+        /// <summary>
+        /// Gets the dungeon generation seed.
+        /// </summary>
+        public int Seed
+        {
+            get
+            {
+                if (currentDungeonMap != null)
+                {
+                    return currentDungeonMap.Seed;
+                }
+                return 0;
+            }
+        }
+
         private void Awake()
         {
             if (instance != null && instance != this)
@@ -138,7 +153,6 @@ namespace MutatingGambit.Systems.Dungeon
             if (gameManager == null) gameManager = FindFirstObjectByType<GameManager>();
             if (boardGenerator == null) boardGenerator = FindFirstObjectByType<BoardGenerator>();
             if (dungeonMapUI == null) dungeonMapUI = FindFirstObjectByType<DungeonMapUI>();
-            if (rewardUI == null) rewardUI = FindFirstObjectByType<RewardSelectionUI>();
             if (rewardUI == null) rewardUI = FindFirstObjectByType<RewardSelectionUI>();
             if (repairUI == null) repairUI = FindFirstObjectByType<RepairUI>();
             if (notificationUI == null) notificationUI = FindFirstObjectByType<NotificationUI>();
@@ -233,8 +247,9 @@ namespace MutatingGambit.Systems.Dungeon
             if (mapGenerator != null)
             {
                 // Use saved seed if available, otherwise generate new one
-                int seed = data.Seed != 0 ? data.Seed : UnityEngine.Random.Range(int.MinValue, int.MaxValue);
-                currentDungeonMap = mapGenerator.GenerateMap(seed); 
+                int seed = data.DungeonSeed != 0 ? data.DungeonSeed : UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+                currentDungeonMap = mapGenerator.GenerateMap(5, 2, 4, seed);
+                 
                 
                 // Set current node
                 // This is tricky without saving the whole graph structure or deterministic generation.
@@ -334,14 +349,18 @@ namespace MutatingGambit.Systems.Dungeon
                     // Initialize board with specified dimensions
                     gameBoard.Initialize(roomData.BoardData.Width, roomData.BoardData.Height);
                     
-                    // Place obstacles if defined in BoardData
-                    if (roomData.BoardData.Obstacles != null)
+                    // Place obstacles based on TileType
+                    for (int y = 0; y < roomData.BoardData.Height; y++)
                     {
-                        foreach (var obstaclePos in roomData.BoardData.Obstacles)
+                        for (int x = 0; x < roomData.BoardData.Width; x++)
                         {
-                            if (gameBoard.IsPositionValid(obstaclePos))
+                            Vector2Int pos = new Vector2Int(x, y);
+                            if (roomData.BoardData.GetTileType(pos) == MutatingGambit.Systems.BoardSystem.TileType.Obstacle)
                             {
-                                gameBoard.PlaceObstacle(obstaclePos);
+                                if (gameBoard.IsPositionValid(pos))
+                                {
+                                    gameBoard.SetObstacle(pos, true);
+                                }
                             }
                         }
                     }

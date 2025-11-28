@@ -30,8 +30,8 @@ namespace MutatingGambit.UI
 
         private void Start()
         {
-            // Find artifact manager
-            artifactManager = FindObjectOfType<ArtifactManager>();
+            // Use singleton instance if available
+            artifactManager = ArtifactManager.Instance;
 
             if (artifactManager == null)
             {

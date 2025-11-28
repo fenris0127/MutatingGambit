@@ -96,6 +96,7 @@
     <Compile Include="Assets\Scripts\Systems\Mutations\InitialMutations\TeleportingKnightMutation.cs" />
     <Compile Include="Assets\Scripts\Systems\Dungeon\RewardData.cs" />
     <Compile Include="Assets\Scripts\Systems\Artifacts\RemainingArtifacts.cs" />
+    <Compile Include="Assets\Scripts\UI\NotificationUI.cs" />
     <Compile Include="Assets\Scripts\Systems\Dungeon\DungeonManager.cs" />
     <Compile Include="Assets\Scripts\Systems\Artifacts\AdvancedArtifacts.cs" />
     <Compile Include="Assets\Scripts\Editor\TutorialContentGenerator.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="Assets\Scripts\Systems\Effects\EffectManager.cs" />
     <Compile Include="Assets\Scripts\Systems\SaveLoad\SaveData.cs" />
     <Compile Include="Assets\Scripts\Editor\BalanceTestWindow.cs" />
+    <Compile Include="Assets\Scripts\Core\MovementRules\MovementRuleFactory.cs" />
     <Compile Include="Assets\Scripts\Systems\Audio\AudioManager.cs" />
     <Compile Include="Assets\Scripts\AI\BossAI.cs" />
     <Compile Include="Assets\Scripts\UI\DungeonMapUI.cs" />
@@ -127,6 +129,7 @@
     <Compile Include="Assets\Scripts\Systems\SaveLoad\GlobalDataManager.cs" />
     <Compile Include="Assets\Scripts\AI\StateEvaluator.cs" />
     <Compile Include="Assets\Scripts\Systems\Mutations\MutationManager.cs" />
+    <Compile Include="Assets\Scripts\Core\ChessEngine\BoardState.cs" />
     <Compile Include="Assets\Scripts\Systems\Artifacts\AdditionalArtifacts.cs" />
     <Compile Include="Assets\Scripts\UI\MainMenuUI.cs" />
     <Compile Include="Assets\Scripts\UI\MutationPanel.cs" />

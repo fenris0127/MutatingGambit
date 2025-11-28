@@ -55,6 +55,7 @@ namespace MutatingGambit.Systems.Artifacts
         public Piece CapturedPiece { get; set; }
         public Team CurrentTeam { get; set; }
         public int TurnNumber { get; set; }
+        public object RepairSystem { get; set; } // Optional reference to RepairSystem
 
         public ArtifactContext() { }
 

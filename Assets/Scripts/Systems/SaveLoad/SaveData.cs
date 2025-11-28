@@ -26,6 +26,7 @@ namespace MutatingGambit.Systems.SaveLoad
     [Serializable]
     public class PlayerSaveData
     {
+        public Team PlayerTeam;
         public List<PieceSaveData> Pieces;
         public List<PieceSaveData> BrokenPieces;
     }
