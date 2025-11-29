@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using MutatingGambit.Core.MovementRules;
 using MutatingGambit.Systems.Artifacts;
@@ -63,6 +64,14 @@ namespace MutatingGambit.Core.ChessEngine
         /// </summary>
         public int Height => height;
 
+        private void Awake()
+        {
+            if (pieces == null)
+            {
+                Initialize(width, height);
+            }
+        }
+
         /// <summary>
         /// Initializes the board with the specified dimensions.
         /// </summary>
@@ -75,25 +84,12 @@ namespace MutatingGambit.Core.ChessEngine
             allPieces.Clear();
         }
 
-        private void Awake()
-        {
-            if (pieces == null)
-            {
-                Initialize(width, height);
-            }
-        }
-
         /// <summary>
         /// Gets the piece at the specified position.
         /// </summary>
         public IPiece GetPieceAt(Vector2Int position)
         {
-            if (!IsPositionValid(position))
-            {
-                return null;
-            }
-
-            return pieces[position.x, position.y];
+            return GetPiece(position);
         }
 
         /// <summary>
@@ -137,26 +133,21 @@ namespace MutatingGambit.Core.ChessEngine
         {
             if (IsPositionValid(position))
             {
-            obstacles[position.x, position.y] = isObstacle;
+                obstacles[position.x, position.y] = isObstacle;
+            }
         }
-    }
 
-    /// <summary>
-    /// Checks if a position has an obstacle.
-    /// </summary>
-    public bool HasObstacle(Vector2Int position)
-    {
-        if (!IsPositionValid(position))
+        /// <summary>
+        /// Checks if a position has an obstacle.
+        /// </summary>
+        public bool HasObstacle(Vector2Int position)
         {
-            return false;
+            return IsObstacle(position);
         }
 
-        return obstacles[position.x, position.y];
-    }
-
-    /// <summary>
-    /// Spawns a new piece on the board.
-    /// </summary>
+        /// <summary>
+        /// Spawns a new piece on the board.
+        /// </summary>
         public Piece SpawnPiece(PieceType type, Team team, Vector2Int position)
         {
             GameObject pieceObject;
@@ -194,8 +185,8 @@ namespace MutatingGambit.Core.ChessEngine
                 return;
             }
 
-            // Remove piece from old position if it exists
-            if (piece.Position.IsWithinBounds(width, height))
+            // Remove piece from old position if it exists and is on the board
+            if (piece.Position.IsWithinBounds(width, height) && pieces[piece.Position.x, piece.Position.y] == piece)
             {
                 pieces[piece.Position.x, piece.Position.y] = null;
             }
@@ -259,11 +250,7 @@ namespace MutatingGambit.Core.ChessEngine
             {
                 pieces[position.x, position.y] = null;
                 allPieces.Remove(piece);
-
-                if (piece != null)
-                {
-                    Destroy(piece.gameObject);
-                }
+                Destroy(piece.gameObject);
             }
         }
 
@@ -312,48 +299,6 @@ namespace MutatingGambit.Core.ChessEngine
         }
 
         /// <summary>
-        /// Creates a deep copy of the board for AI simulation.
-        /// WARNING: This method creates GameObjects which is slow. Use CloneAsState() for AI instead.
-        /// </summary>
-        [System.Obsolete("Use CloneAsState() for better performance in AI simulations")]
-        public Board Clone()
-        {
-            GameObject clonedObject = new GameObject("ClonedBoard");
-            Board clonedBoard = clonedObject.AddComponent<Board>();
-            clonedBoard.Initialize(width, height);
-
-            // Copy obstacles
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    clonedBoard.obstacles[x, y] = obstacles[x, y];
-                }
-            }
-
-            // Copy pieces
-            foreach (var piece in allPieces)
-            {
-                if (piece != null)
-                {
-                    GameObject pieceObject = new GameObject($"Clone_{piece.Type}_{piece.Team}");
-                    Piece clonedPiece = pieceObject.AddComponent<Piece>();
-                    clonedPiece.Initialize(piece.Type, piece.Team, piece.Position);
-
-                    // Copy movement rules
-                    foreach (var rule in piece.MovementRules)
-                    {
-                        clonedPiece.AddMovementRule(rule);
-                    }
-
-                    clonedBoard.PlacePiece(clonedPiece, piece.Position);
-                }
-            }
-
-            return clonedBoard;
-        }
-
-        /// <summary>
         /// Creates a lightweight board state for AI simulation without GameObject overhead.
         /// This is significantly faster than Clone() for AI move evaluation.
         /// </summary>
@@ -367,7 +312,7 @@ namespace MutatingGambit.Core.ChessEngine
         /// </summary>
         public override string ToString()
         {
-            var result = new System.Text.StringBuilder();
+            var result = new StringBuilder();
             result.AppendLine($"Board ({width}x{height}):");
 
             for (int y = height - 1; y >= 0; y--)

@@ -83,15 +83,7 @@ namespace MutatingGambit.Systems.Mutations
             // Check compatibility
             if (!mutation.IsCompatibleWith(piece.Type))
             {
-                // Build compatible types string for better error message
-                var compatibleTypes = mutation.Tags != null && mutation.Tags.Length > 0 
-                    ? string.Join(", ", mutation.Tags)
-                    : "No specific compatibility info available";
-                
-                Debug.LogWarning(
-                    $"Mutation '{mutation.MutationName}' is not compatible with {piece.Type} at {piece.Position}. " +
-                    $"This mutation may be designed for specific piece types. Tags: [{compatibleTypes}]"
-                );
+                LogCompatibilityWarning(piece, mutation);
                 return;
             }
 
@@ -105,28 +97,7 @@ namespace MutatingGambit.Systems.Mutations
             // Check if mutation is already applied
             if (pieceMutations[piece].Contains(mutation))
             {
-                // Handle stacking
-                if (mutation.CanStack)
-                {
-                    int currentStacks = mutationStacks[piece][mutation];
-                    if (currentStacks < mutation.MaxStacks)
-                    {
-                        mutationStacks[piece][mutation]++;
-                        Debug.Log($"Stacked '{mutation.MutationName}' on {piece.Type} (Stack: {mutationStacks[piece][mutation]})");
-                        
-                        // Reapply for stack bonus
-                        mutation.ApplyToPiece(piece);
-                        OnMutationApplied?.Invoke(piece, mutation);
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"Mutation '{mutation.MutationName}' is already at max stacks ({mutation.MaxStacks}).");
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning($"Mutation '{mutation.MutationName}' is already applied and cannot stack.");
-                }
+                HandleStacking(piece, mutation);
                 return;
             }
 
@@ -141,12 +112,54 @@ namespace MutatingGambit.Systems.Mutations
             OnMutationApplied?.Invoke(piece, mutation);
 
             // Unlock in Codex
+            UnlockInCodex(mutation);
+
+            Debug.Log($"Applied mutation '{mutation.MutationName}' to {piece.Type} at {piece.Position}");
+        }
+
+        private void LogCompatibilityWarning(Piece piece, Mutation mutation)
+        {
+            var compatibleTypes = mutation.Tags != null && mutation.Tags.Length > 0 
+                ? string.Join(", ", mutation.Tags)
+                : "No specific compatibility info available";
+            
+            Debug.LogWarning(
+                $"Mutation '{mutation.MutationName}' is not compatible with {piece.Type} at {piece.Position}. " +
+                $"This mutation may be designed for specific piece types. Tags: [{compatibleTypes}]"
+            );
+        }
+
+        private void HandleStacking(Piece piece, Mutation mutation)
+        {
+            if (mutation.CanStack)
+            {
+                int currentStacks = mutationStacks[piece][mutation];
+                if (currentStacks < mutation.MaxStacks)
+                {
+                    mutationStacks[piece][mutation]++;
+                    Debug.Log($"Stacked '{mutation.MutationName}' on {piece.Type} (Stack: {mutationStacks[piece][mutation]})");
+                    
+                    // Reapply for stack bonus
+                    mutation.ApplyToPiece(piece);
+                    OnMutationApplied?.Invoke(piece, mutation);
+                }
+                else
+                {
+                    Debug.LogWarning($"Mutation '{mutation.MutationName}' is already at max stacks ({mutation.MaxStacks}).");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Mutation '{mutation.MutationName}' is already applied and cannot stack.");
+            }
+        }
+
+        private void UnlockInCodex(Mutation mutation)
+        {
             if (GlobalDataManager.Instance != null)
             {
                 GlobalDataManager.Instance.UnlockMutation(mutation.MutationName);
             }
-
-            Debug.Log($"Applied mutation '{mutation.MutationName}' to {piece.Type} at {piece.Position}");
         }
 
         /// <summary>

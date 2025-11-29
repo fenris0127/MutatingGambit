@@ -91,6 +91,7 @@
     <Compile Include="Assets\Scripts\Systems\Artifacts\TimeWarpArtifact.cs" />
     <Compile Include="Assets\Scripts\Systems\Audio\AudioConfig.cs" />
     <Compile Include="Assets\Scripts\Systems\Mutations\MutationLibrary.cs" />
+    <Compile Include="Assets\Scripts\Core\ChessEngine\BoardFactory.cs" />
     <Compile Include="Assets\Scripts\UI\TooltipManager.cs" />
     <Compile Include="Assets\Scripts\Systems\Artifacts\KingsShadowArtifact.cs" />
     <Compile Include="Assets\Scripts\Systems\Mutations\InitialMutations\TeleportingKnightMutation.cs" />

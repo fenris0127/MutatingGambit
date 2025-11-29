@@ -18,7 +18,10 @@ namespace MutatingGambit.Core.ChessEngine
 
         private Piece selectedPiece;
         private Camera mainCamera;
+        private List<GameObject> activeHighlights = new List<GameObject>();
         private List<Vector2Int> highlightedMoves = new List<Vector2Int>();
+
+        private const int LeftMouseButton = 0;
 
         private void Start()
         {
@@ -29,15 +32,20 @@ namespace MutatingGambit.Core.ChessEngine
 
         private void Update()
         {
-            if (gameManager.CurrentTurn != gameManager.PlayerTeam || gameManager.State != GameManager.GameState.PlayerTurn)
+            if (!IsPlayerTurn())
             {
                 return;
             }
 
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(LeftMouseButton))
             {
                 HandleInput();
             }
+        }
+
+        private bool IsPlayerTurn()
+        {
+            return gameManager.CurrentTurn == gameManager.PlayerTeam && gameManager.State == GameManager.GameState.PlayerTurn;
         }
 
         private void HandleInput()
@@ -47,12 +55,6 @@ namespace MutatingGambit.Core.ChessEngine
 
             if (hit.collider != null)
             {
-                // Check if we clicked a piece or a tile
-                Piece clickedPiece = hit.collider.GetComponent<Piece>();
-                // If piece has collider, great. If not, maybe tile has it.
-                // Assuming Tile has collider.
-                
-                // Let's assume we get the grid position from the hit point or component
                 Vector2Int gridPos = GetGridPosition(hit.point);
                 
                 if (board.IsPositionValid(gridPos))
@@ -64,9 +66,6 @@ namespace MutatingGambit.Core.ChessEngine
 
         private Vector2Int GetGridPosition(Vector2 worldPos)
         {
-            // Assuming 1 unit per tile and centered at 0.5, 0.5 or something.
-            // We need to know the board's origin and tile size.
-            // For now, let's assume standard integer coordinates.
             return new Vector2Int(Mathf.RoundToInt(worldPos.x), Mathf.RoundToInt(worldPos.y));
         }
 
@@ -76,61 +75,62 @@ namespace MutatingGambit.Core.ChessEngine
 
             if (selectedPiece == null)
             {
-                // Select piece
-                if (clickedPiece != null && clickedPiece.Team == gameManager.PlayerTeam)
-                {
-                    selectedPiece = clickedPiece;
-                    
-                    // Show highlights for valid moves
-                    highlightedMoves = selectedPiece.GetValidMoves(board);
-                    HighlightMoves(highlightedMoves);
-                    
-                    Debug.Log($"Selected {selectedPiece}");
-                }
+                TrySelectPiece(clickedPiece);
             }
             else
             {
-                // Move or Deselect
                 if (clickedPiece != null && clickedPiece.Team == gameManager.PlayerTeam)
                 {
-                    // Change selection
-                    ClearHighlights();
-                    
-                    selectedPiece = clickedPiece;
-                    highlightedMoves = selectedPiece.GetValidMoves(board);
-                    HighlightMoves(highlightedMoves);
-                    
-                    Debug.Log($"Selected {selectedPiece}");
+                    ChangeSelection(clickedPiece);
                 }
                 else
                 {
-                    // Attempt move
-                    if (TutorialManager.Instance != null && !TutorialManager.Instance.IsMoveAllowed(selectedPiece.Position, gridPos))
-                    {
-                        Debug.Log("Move restricted by tutorial");
-                        return;
-                    }
-
-                    // Validate move
-                    // We need a MoveValidator or check piece rules
-                    // For now, let's assume GameManager.ExecuteMove handles validation or we check Piece.GetValidMoves
-                    
-                    bool success = gameManager.ExecuteMove(selectedPiece.Position, gridPos);
-                    if (success)
-                    {
-                        // Clear highlights and deselect
-                        ClearHighlights();
-                        selectedPiece = null;
-                    }
-                    else
-                    {
-                        Debug.Log("Invalid move");
-                    }
+                    TryMovePiece(gridPos);
                 }
             }
         }
 
-        private List<GameObject> activeHighlights = new List<GameObject>();
+        private void TrySelectPiece(Piece piece)
+        {
+            if (piece != null && piece.Team == gameManager.PlayerTeam)
+            {
+                SelectPiece(piece);
+            }
+        }
+
+        private void ChangeSelection(Piece newPiece)
+        {
+            ClearHighlights();
+            SelectPiece(newPiece);
+        }
+
+        private void SelectPiece(Piece piece)
+        {
+            selectedPiece = piece;
+            highlightedMoves = selectedPiece.GetValidMoves(board);
+            HighlightMoves(highlightedMoves);
+            Debug.Log($"Selected {selectedPiece}");
+        }
+
+        private void TryMovePiece(Vector2Int targetPos)
+        {
+            if (TutorialManager.Instance != null && !TutorialManager.Instance.IsMoveAllowed(selectedPiece.Position, targetPos))
+            {
+                Debug.Log("Move restricted by tutorial");
+                return;
+            }
+
+            bool success = gameManager.ExecuteMove(selectedPiece.Position, targetPos);
+            if (success)
+            {
+                ClearHighlights();
+                selectedPiece = null;
+            }
+            else
+            {
+                Debug.Log("Invalid move");
+            }
+        }
 
         /// <summary>
         /// Highlights the given positions on the board.
@@ -141,7 +141,6 @@ namespace MutatingGambit.Core.ChessEngine
 
             if (highlightPrefab == null)
             {
-                // Fallback to debug log if no prefab assigned
                 foreach (var pos in positions)
                 {
                     Debug.Log($"Highlighting position: {pos}");
@@ -151,10 +150,6 @@ namespace MutatingGambit.Core.ChessEngine
 
             foreach (var pos in positions)
             {
-                // Instantiate highlight prefab at position
-                // Assuming board tiles are at (x, y, 0) or similar. 
-                // We might need to adjust Z or Y depending on board orientation.
-                // Assuming 2D for now as per other scripts.
                 Vector3 worldPos = new Vector3(pos.x, pos.y, 0); 
                 GameObject highlight = Instantiate(highlightPrefab, worldPos, Quaternion.identity);
                 activeHighlights.Add(highlight);

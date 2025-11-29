@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using MutatingGambit.Core.ChessEngine;
+using MutatingGambit.Systems.Dungeon;
 
 namespace MutatingGambit.Systems.PieceManagement
 {
@@ -102,6 +103,11 @@ namespace MutatingGambit.Systems.PieceManagement
 
             brokenPieces.Remove(pieceHealth);
             activePieces.Remove(pieceHealth);
+            
+            // Note: We can't easily unsubscribe anonymous delegates (lambdas). 
+            // In a more robust system, we'd use method groups or a wrapper, 
+            // but for now, relying on Unity's event system cleanup when objects are destroyed is acceptable 
+            // if the PieceHealth component is destroyed with the piece.
         }
 
         /// <summary>
@@ -121,7 +127,7 @@ namespace MutatingGambit.Systems.PieceManagement
         /// <summary>
         /// Attempts to repair a piece.
         /// </summary>
-        public bool RepairPiece(PieceHealth pieceHealth)
+        public bool RepairPiece(PieceHealth pieceHealth, PlayerState playerState = null)
         {
             if (pieceHealth == null || !pieceHealth.CanBeRepaired)
             {
@@ -138,13 +144,12 @@ namespace MutatingGambit.Systems.PieceManagement
             // Check repair cost (if using currency system)
             if (usesRepairCost && pieceHealth.RepairCost > 0)
             {
-                var dungeonManager = MutatingGambit.Systems.Dungeon.DungeonManager.Instance;
-                if (dungeonManager != null && dungeonManager.PlayerState != null)
+                if (playerState != null)
                 {
-                    if (dungeonManager.PlayerState.Currency >= pieceHealth.RepairCost)
+                    if (playerState.Currency >= pieceHealth.RepairCost)
                     {
-                        dungeonManager.PlayerState.Currency -= pieceHealth.RepairCost;
-                        Debug.Log($"Paid {pieceHealth.RepairCost} for repair. Remaining: {dungeonManager.PlayerState.Currency}");
+                        playerState.Currency -= pieceHealth.RepairCost;
+                        Debug.Log($"Paid {pieceHealth.RepairCost} for repair. Remaining: {playerState.Currency}");
                     }
                     else
                     {
@@ -154,7 +159,10 @@ namespace MutatingGambit.Systems.PieceManagement
                 }
                 else
                 {
-                    Debug.LogWarning("Cannot check currency - DungeonManager or PlayerState not found.");
+                    Debug.LogWarning("Cannot check currency - PlayerState not provided.");
+                    // Depending on design, might want to return false here or allow free repair if state is missing.
+                    // For safety, let's fail if cost is required but state is missing.
+                    return false; 
                 }
             }
 

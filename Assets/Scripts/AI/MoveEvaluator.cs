@@ -56,19 +56,14 @@ namespace MutatingGambit.AI
                 return 0f;
             }
 
-            // Clone board to simulate move
-            Board clonedBoard = board.Clone();
+            // Create lightweight state to simulate move
+            BoardState clonedState = board.CloneAsState();
 
-            // Execute move on cloned board
-            bool moveSuccess = clonedBoard.MovePiece(move.From, move.To);
-
-            if (!moveSuccess)
-            {
-                return float.MinValue; // Invalid move
-            }
+            // Execute move on cloned state
+            clonedState.SimulateMove(move.From, move.To);
 
             // Evaluate resulting position
-            float score = stateEvaluator.EvaluateBoard(clonedBoard);
+            float score = stateEvaluator.EvaluateBoardState(clonedState);
 
             // Bonus for captures
             if (move.CapturedPiece != null)

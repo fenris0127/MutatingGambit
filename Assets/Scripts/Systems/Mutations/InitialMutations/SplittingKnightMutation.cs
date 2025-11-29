@@ -11,7 +11,7 @@ namespace MutatingGambit.Systems.Mutations
     {
         [Header("Spawn Settings")]
         [SerializeField]
-        [Tooltip("Prefab for the pawn to spawn. If null, will try to find from resources.")]
+        [Tooltip("Prefab for the pawn to spawn. If null, will use the board's default spawn method.")]
         private GameObject pawnPrefab;
 
         public override void ApplyToPiece(Piece piece)
@@ -21,8 +21,6 @@ namespace MutatingGambit.Systems.Mutations
                 Debug.LogWarning("SplittingKnightMutation can only be applied to Knights.");
                 return;
             }
-
-            // No movement rule changes needed - effect happens on capture
         }
 
         public override void RemoveFromPiece(Piece piece)
@@ -32,7 +30,6 @@ namespace MutatingGambit.Systems.Mutations
 
         public override void OnCapture(Piece mutatedPiece, Piece capturedPiece, Vector2Int fromPos, Vector2Int toPos, Board board)
         {
-            // Spawn pawn at original position
             SpawnPawn(fromPos, mutatedPiece.Team, board);
         }
 
@@ -41,7 +38,6 @@ namespace MutatingGambit.Systems.Mutations
         /// </summary>
         private void SpawnPawn(Vector2Int position, Team team, Board board)
         {
-            // Check if position is valid and empty
             if (!board.IsPositionValid(position) || board.GetPiece(position) != null)
             {
                 Debug.LogWarning($"SplittingKnight: Cannot spawn pawn at {position}, invalid or occupied.");
@@ -59,7 +55,6 @@ namespace MutatingGambit.Systems.Mutations
             }
             else
             {
-                // Fallback to board's spawn method
                 board.SpawnPiece(PieceType.Pawn, team, position);
             }
             
