@@ -35,10 +35,13 @@ namespace MutatingGambit.AI
     /// </summary>
     public class MoveEvaluator
     {
+        #region 변수
         private AIConfig config;
         private StateEvaluator stateEvaluator;
         private Team aiTeam;
+        #endregion
 
+        #region 공개 메서드
         public MoveEvaluator(AIConfig aiConfig, StateEvaluator evaluator, Team team)
         {
             config = aiConfig;
@@ -87,7 +90,9 @@ namespace MutatingGambit.AI
 
             return score;
         }
+        #endregion
 
+        #region 비공개 메서드
         /// <summary>
         /// Checks if a position controls the center of the board.
         /// </summary>
@@ -100,5 +105,6 @@ namespace MutatingGambit.AI
             return (position.x == centerX - 1 || position.x == centerX) &&
                    (position.y == centerY - 1 || position.y == centerY);
         }
+        #endregion
     }
 }

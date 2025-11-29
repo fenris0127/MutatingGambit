@@ -12,6 +12,7 @@ namespace MutatingGambit.Systems.PieceManagement
     /// </summary>
     public class RepairSystem : MonoBehaviour
     {
+        #region 변수
         [Header("Settings")]
         [SerializeField]
         [Tooltip("Maximum number of pieces that can be repaired per rest room visit.")]
@@ -35,7 +36,9 @@ namespace MutatingGambit.Systems.PieceManagement
         public UnityEvent<PieceHealth> OnPieceBroken;
         public UnityEvent<PieceHealth> OnPieceRepaired;
         public UnityEvent<int> OnRepairsAvailableChanged;
+        #endregion
 
+        #region 속성
         /// <summary>
         /// Gets the list of broken pieces.
         /// </summary>
@@ -60,7 +63,9 @@ namespace MutatingGambit.Systems.PieceManagement
         /// Gets whether any repairs are available.
         /// </summary>
         public bool CanRepair => RepairsRemaining > 0;
+        #endregion
 
+        #region 공개 메서드
         /// <summary>
         /// Registers a piece with the repair system.
         /// </summary>
@@ -198,46 +203,6 @@ namespace MutatingGambit.Systems.PieceManagement
         }
 
         /// <summary>
-        /// Handles a piece breaking.
-        /// </summary>
-        private void HandlePieceBroken(PieceHealth pieceHealth)
-        {
-            if (activePieces.Contains(pieceHealth))
-            {
-                activePieces.Remove(pieceHealth);
-            }
-
-            if (!brokenPieces.Contains(pieceHealth))
-            {
-                brokenPieces.Add(pieceHealth);
-            }
-
-            OnPieceBroken?.Invoke(pieceHealth);
-
-            Debug.Log($"Piece broken. Broken count: {brokenPieces.Count}");
-        }
-
-        /// <summary>
-        /// Handles a piece being repaired.
-        /// </summary>
-        private void HandlePieceRepaired(PieceHealth pieceHealth)
-        {
-            if (brokenPieces.Contains(pieceHealth))
-            {
-                brokenPieces.Remove(pieceHealth);
-            }
-
-            if (!activePieces.Contains(pieceHealth))
-            {
-                activePieces.Add(pieceHealth);
-            }
-
-            OnPieceRepaired?.Invoke(pieceHealth);
-
-            Debug.Log($"Piece repaired. Broken count: {brokenPieces.Count}");
-        }
-
-        /// <summary>
         /// Checks if the king is broken (game over condition).
         /// </summary>
         public bool IsKingBroken(Team team)
@@ -307,9 +272,50 @@ namespace MutatingGambit.Systems.PieceManagement
         /// <summary>
         /// Gets statistics about piece health.
         /// </summary>
-        public string GetStats()
+        public string GetStats() => 
+            $"Active: {activePieces.Count}, Broken: {brokenPieces.Count}, Repairs Left: {RepairsRemaining}";
+        #endregion
+
+        #region 비공개 메서드
+        /// <summary>
+        /// Handles a piece breaking.
+        /// </summary>
+        private void HandlePieceBroken(PieceHealth pieceHealth)
         {
-            return $"Active: {activePieces.Count}, Broken: {brokenPieces.Count}, Repairs Left: {RepairsRemaining}";
+            if (activePieces.Contains(pieceHealth))
+            {
+                activePieces.Remove(pieceHealth);
+            }
+
+            if (!brokenPieces.Contains(pieceHealth))
+            {
+                brokenPieces.Add(pieceHealth);
+            }
+
+            OnPieceBroken?.Invoke(pieceHealth);
+
+            Debug.Log($"Piece broken. Broken count: {brokenPieces.Count}");
         }
+
+        /// <summary>
+        /// Handles a piece being repaired.
+        /// </summary>
+        private void HandlePieceRepaired(PieceHealth pieceHealth)
+        {
+            if (brokenPieces.Contains(pieceHealth))
+            {
+                brokenPieces.Remove(pieceHealth);
+            }
+
+            if (!activePieces.Contains(pieceHealth))
+            {
+                activePieces.Add(pieceHealth);
+            }
+
+            OnPieceRepaired?.Invoke(pieceHealth);
+
+            Debug.Log($"Piece repaired. Broken count: {brokenPieces.Count}");
+        }
+        #endregion
     }
 }

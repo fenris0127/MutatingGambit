@@ -9,6 +9,7 @@ namespace MutatingGambit.Systems.Dungeon
     [CreateAssetMenu(fileName = "CaptureSpecificPiece", menuName = "Victory Conditions/Capture Specific Piece")]
     public class CaptureSpecificPieceCondition : VictoryCondition
     {
+        #region 변수
         [Header("Target")]
         [SerializeField]
         [Tooltip("The type of piece that must be captured.")]
@@ -23,12 +24,16 @@ namespace MutatingGambit.Systems.Dungeon
         private bool anyOfType = true;
 
         private bool targetCaptured = false;
+        #endregion
 
+        #region 속성
         /// <summary>
         /// Gets the target piece type.
         /// </summary>
         public PieceType TargetPieceType => targetPieceType;
+        #endregion
 
+        #region 공개 메서드
         public override bool IsVictoryAchieved(Board board, int currentTurn, Team playerTeam)
         {
             if (targetCaptured)
@@ -69,27 +74,12 @@ namespace MutatingGambit.Systems.Dungeon
             return targetCaptured;
         }
 
-        public override bool IsDefeatConditionMet(Board board, int currentTurn, Team playerTeam)
-        {
-            // This condition doesn't have a defeat state (unless player loses their king)
-            // That would be handled by the game manager
-            return false;
-        }
+        public override bool IsDefeatConditionMet(Board board, int currentTurn, Team playerTeam) => false;
 
-        public override string GetProgressString(Board board, int currentTurn, Team playerTeam)
-        {
-            if (targetCaptured)
-            {
-                return $"Target {targetPieceType} captured!";
-            }
+        public override string GetProgressString(Board board, int currentTurn, Team playerTeam) => 
+            targetCaptured ? $"Target {targetPieceType} captured!" : $"Capture enemy {targetPieceType}";
 
-            return $"Capture enemy {targetPieceType}";
-        }
-
-        public override void Reset()
-        {
-            targetCaptured = false;
-        }
+        public override void Reset() => targetCaptured = false;
 
         /// <summary>
         /// Sets the target piece parameters.
@@ -100,5 +90,6 @@ namespace MutatingGambit.Systems.Dungeon
             targetStartPosition = position;
             anyOfType = anyType;
         }
+        #endregion
     }
 }

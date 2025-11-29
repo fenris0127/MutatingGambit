@@ -9,11 +9,14 @@ namespace MutatingGambit.Systems.Mutations
     [CreateAssetMenu(fileName = "SplittingKnightMutation", menuName = "Mutations/Initial/Splitting Knight")]
     public class SplittingKnightMutation : Mutation
     {
+        #region 변수
         [Header("Spawn Settings")]
         [SerializeField]
         [Tooltip("Prefab for the pawn to spawn. If null, will use the board's default spawn method.")]
         private GameObject pawnPrefab;
+        #endregion
 
+        #region 공개 메서드
         public override void ApplyToPiece(Piece piece)
         {
             if (piece.Type != PieceType.Knight)
@@ -33,6 +36,10 @@ namespace MutatingGambit.Systems.Mutations
             SpawnPawn(fromPos, mutatedPiece.Team, board);
         }
 
+        public override bool IsCompatibleWith(PieceType pieceType) => pieceType == PieceType.Knight;
+        #endregion
+
+        #region 비공개 메서드
         /// <summary>
         /// Spawns a pawn at the specified position.
         /// </summary>
@@ -60,5 +67,6 @@ namespace MutatingGambit.Systems.Mutations
             
             Debug.Log($"SplittingKnight: Spawned pawn at {position}");
         }
+        #endregion
     }
 }

@@ -12,6 +12,7 @@ namespace MutatingGambit.Core.ChessEngine
     /// </summary>
     public class Board : MonoBehaviour, IBoard
     {
+        #region 변수
         [SerializeField]
         private int width = 8;
 
@@ -37,7 +38,9 @@ namespace MutatingGambit.Core.ChessEngine
         /// Args: Moving Piece, From Position, To Position, Captured Piece (can be null)
         /// </summary>
         public event System.Action<Piece, Vector2Int, Vector2Int, Piece> OnPieceMoved;
+        #endregion
 
+        #region 속성
         /// <summary>
         /// Gets the artifact manager for this board.
         /// </summary>
@@ -63,7 +66,9 @@ namespace MutatingGambit.Core.ChessEngine
         /// Gets the height of the board.
         /// </summary>
         public int Height => height;
+        #endregion
 
+        #region Unity 생명주기
         private void Awake()
         {
             if (pieces == null)
@@ -71,7 +76,9 @@ namespace MutatingGambit.Core.ChessEngine
                 Initialize(width, height);
             }
         }
+        #endregion
 
+        #region 공개 메서드
         /// <summary>
         /// Initializes the board with the specified dimensions.
         /// </summary>
@@ -87,10 +94,7 @@ namespace MutatingGambit.Core.ChessEngine
         /// <summary>
         /// Gets the piece at the specified position.
         /// </summary>
-        public IPiece GetPieceAt(Vector2Int position)
-        {
-            return GetPiece(position);
-        }
+        public IPiece GetPieceAt(Vector2Int position) => GetPiece(position);
 
         /// <summary>
         /// Gets the piece at the specified position (returns Piece type).
@@ -108,10 +112,7 @@ namespace MutatingGambit.Core.ChessEngine
         /// <summary>
         /// Checks if a position is within board bounds.
         /// </summary>
-        public bool IsPositionValid(Vector2Int position)
-        {
-            return position.IsWithinBounds(width, height);
-        }
+        public bool IsPositionValid(Vector2Int position) => position.IsWithinBounds(width, height);
 
         /// <summary>
         /// Checks if a position contains an obstacle.
@@ -140,10 +141,7 @@ namespace MutatingGambit.Core.ChessEngine
         /// <summary>
         /// Checks if a position has an obstacle.
         /// </summary>
-        public bool HasObstacle(Vector2Int position)
-        {
-            return IsObstacle(position);
-        }
+        public bool HasObstacle(Vector2Int position) => IsObstacle(position);
 
         /// <summary>
         /// Spawns a new piece on the board.
@@ -273,10 +271,7 @@ namespace MutatingGambit.Core.ChessEngine
         /// <summary>
         /// Gets all pieces on the board.
         /// </summary>
-        public List<Piece> GetAllPieces()
-        {
-            return new List<Piece>(allPieces);
-        }
+        public List<Piece> GetAllPieces() => new List<Piece>(allPieces);
 
         /// <summary>
         /// Clears all pieces from the board.
@@ -302,10 +297,7 @@ namespace MutatingGambit.Core.ChessEngine
         /// Creates a lightweight board state for AI simulation without GameObject overhead.
         /// This is significantly faster than Clone() for AI move evaluation.
         /// </summary>
-        public BoardState CloneAsState()
-        {
-            return BoardState.FromBoard(this);
-        }
+        public BoardState CloneAsState() => BoardState.FromBoard(this);
 
         /// <summary>
         /// Returns a string representation of the board for debugging.
@@ -345,7 +337,9 @@ namespace MutatingGambit.Core.ChessEngine
 
             return result.ToString();
         }
+        #endregion
 
+        #region 비공개 메서드
         private string GetPieceSymbol(Piece piece)
         {
             string symbol = piece.Type switch
@@ -361,5 +355,6 @@ namespace MutatingGambit.Core.ChessEngine
 
             return piece.Team == Team.White ? symbol + " " : symbol.ToLower() + " ";
         }
+        #endregion
     }
 }

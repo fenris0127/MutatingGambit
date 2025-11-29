@@ -4,6 +4,7 @@ using MutatingGambit.Core.ChessEngine;
 using MutatingGambit.Systems.Artifacts;
 using MutatingGambit.Systems.Mutations;
 using MutatingGambit.Systems.PieceManagement;
+using MutatingGambit.Systems.SaveLoad;
 
 namespace MutatingGambit.Systems.Dungeon
 {
@@ -14,6 +15,7 @@ namespace MutatingGambit.Systems.Dungeon
     [System.Serializable]
     public class PlayerState
     {
+        #region 변수
         [Header("Player Info")]
         [SerializeField]
         private Team playerTeam = Team.White;
@@ -41,7 +43,9 @@ namespace MutatingGambit.Systems.Dungeon
 
         [SerializeField]
         private int totalMoves = 0;
+        #endregion
 
+        #region 속성
         /// <summary>
         /// Gets the player's team.
         /// </summary>
@@ -97,7 +101,9 @@ namespace MutatingGambit.Systems.Dungeon
             get => totalMoves;
             set => totalMoves = value;
         }
+        #endregion
 
+        #region 공개 메서드
         /// <summary>
         /// Creates a new player state with a standard chess setup.
         /// </summary>
@@ -213,34 +219,22 @@ namespace MutatingGambit.Systems.Dungeon
         /// <summary>
         /// Removes an artifact from the player's collection.
         /// </summary>
-        public void RemoveArtifact(Artifact artifact)
-        {
-            collectedArtifacts.Remove(artifact);
-        }
+        public void RemoveArtifact(Artifact artifact) => collectedArtifacts.Remove(artifact);
 
         /// <summary>
         /// Checks if the player has a specific artifact.
         /// </summary>
-        public bool HasArtifact(Artifact artifact)
-        {
-            return collectedArtifacts.Contains(artifact);
-        }
+        public bool HasArtifact(Artifact artifact) => collectedArtifacts.Contains(artifact);
 
         /// <summary>
         /// Increments the room clear counter.
         /// </summary>
-        public void IncrementRoomsCleared()
-        {
-            roomsCleared++;
-        }
+        public void IncrementRoomsCleared() => roomsCleared++;
 
         /// <summary>
         /// Increments the floor clear counter.
         /// </summary>
-        public void IncrementFloorsCleared()
-        {
-            floorsCleared++;
-        }
+        public void IncrementFloorsCleared() => floorsCleared++;
 
         /// <summary>
         /// Loads player state from save data.
@@ -312,6 +306,7 @@ namespace MutatingGambit.Systems.Dungeon
             roomsCleared = 0;
             floorsCleared = 0;
         }
+        #endregion
     }
 
     /// <summary>

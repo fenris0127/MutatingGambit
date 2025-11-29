@@ -10,8 +10,29 @@ namespace MutatingGambit.Systems.Mutations
     /// </summary>
     public class MutationManager : MonoBehaviour
     {
+        #region 변수
         private static MutationManager instance;
 
+        // Tracks which mutations are applied to which pieces
+        private Dictionary<Piece, List<Mutation>> pieceMutations = new Dictionary<Piece, List<Mutation>>();
+
+        // Tracks stack counts for stackable mutations
+        private Dictionary<Piece, Dictionary<Mutation, int>> mutationStacks = new Dictionary<Piece, Dictionary<Mutation, int>>();
+
+        /// <summary>
+        /// Event fired when a mutation is applied to a piece.
+        /// Args: Piece, Mutation
+        /// </summary>
+        public event System.Action<Piece, Mutation> OnMutationApplied;
+
+        /// <summary>
+        /// Event fired when a mutation is removed from a piece.
+        /// Args: Piece, Mutation
+        /// </summary>
+        public event System.Action<Piece, Mutation> OnMutationRemoved;
+        #endregion
+
+        #region 속성
         /// <summary>
         /// Gets the singleton instance of the MutationManager.
         /// </summary>
@@ -32,25 +53,9 @@ namespace MutatingGambit.Systems.Mutations
                 return instance;
             }
         }
+        #endregion
 
-        // Tracks which mutations are applied to which pieces
-        private Dictionary<Piece, List<Mutation>> pieceMutations = new Dictionary<Piece, List<Mutation>>();
-
-        // Tracks stack counts for stackable mutations
-        private Dictionary<Piece, Dictionary<Mutation, int>> mutationStacks = new Dictionary<Piece, Dictionary<Mutation, int>>();
-
-        /// <summary>
-        /// Event fired when a mutation is applied to a piece.
-        /// Args: Piece, Mutation
-        /// </summary>
-        public event System.Action<Piece, Mutation> OnMutationApplied;
-
-        /// <summary>
-        /// Event fired when a mutation is removed from a piece.
-        /// Args: Piece, Mutation
-        /// </summary>
-        public event System.Action<Piece, Mutation> OnMutationRemoved;
-
+        #region Unity 생명주기
         private void Awake()
         {
             if (instance != null && instance != this)
@@ -63,6 +68,16 @@ namespace MutatingGambit.Systems.Mutations
             DontDestroyOnLoad(gameObject);
         }
 
+        private void OnDestroy()
+        {
+            if (instance == this)
+            {
+                instance = null;
+            }
+        }
+        #endregion
+
+        #region 공개 메서드
         /// <summary>
         /// Applies a mutation to a piece.
         /// </summary>
@@ -115,51 +130,6 @@ namespace MutatingGambit.Systems.Mutations
             UnlockInCodex(mutation);
 
             Debug.Log($"Applied mutation '{mutation.MutationName}' to {piece.Type} at {piece.Position}");
-        }
-
-        private void LogCompatibilityWarning(Piece piece, Mutation mutation)
-        {
-            var compatibleTypes = mutation.Tags != null && mutation.Tags.Length > 0 
-                ? string.Join(", ", mutation.Tags)
-                : "No specific compatibility info available";
-            
-            Debug.LogWarning(
-                $"Mutation '{mutation.MutationName}' is not compatible with {piece.Type} at {piece.Position}. " +
-                $"This mutation may be designed for specific piece types. Tags: [{compatibleTypes}]"
-            );
-        }
-
-        private void HandleStacking(Piece piece, Mutation mutation)
-        {
-            if (mutation.CanStack)
-            {
-                int currentStacks = mutationStacks[piece][mutation];
-                if (currentStacks < mutation.MaxStacks)
-                {
-                    mutationStacks[piece][mutation]++;
-                    Debug.Log($"Stacked '{mutation.MutationName}' on {piece.Type} (Stack: {mutationStacks[piece][mutation]})");
-                    
-                    // Reapply for stack bonus
-                    mutation.ApplyToPiece(piece);
-                    OnMutationApplied?.Invoke(piece, mutation);
-                }
-                else
-                {
-                    Debug.LogWarning($"Mutation '{mutation.MutationName}' is already at max stacks ({mutation.MaxStacks}).");
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"Mutation '{mutation.MutationName}' is already applied and cannot stack.");
-            }
-        }
-
-        private void UnlockInCodex(Mutation mutation)
-        {
-            if (GlobalDataManager.Instance != null)
-            {
-                GlobalDataManager.Instance.UnlockMutation(mutation.MutationName);
-            }
         }
 
         /// <summary>
@@ -230,10 +200,8 @@ namespace MutatingGambit.Systems.Mutations
         /// <summary>
         /// Checks if a piece has any mutations.
         /// </summary>
-        public bool HasMutations(Piece piece)
-        {
-            return piece != null && pieceMutations.ContainsKey(piece) && pieceMutations[piece].Count > 0;
-        }
+        public bool HasMutations(Piece piece) => 
+            piece != null && pieceMutations.ContainsKey(piece) && pieceMutations[piece].Count > 0;
 
         /// <summary>
         /// Checks if a piece has a specific mutation.
@@ -321,13 +289,53 @@ namespace MutatingGambit.Systems.Mutations
             pieceMutations.Remove(piece);
             mutationStacks.Remove(piece);
         }
+        #endregion
 
-        private void OnDestroy()
+        #region 비공개 메서드
+        private void LogCompatibilityWarning(Piece piece, Mutation mutation)
         {
-            if (instance == this)
+            var compatibleTypes = mutation.Tags != null && mutation.Tags.Length > 0 
+                ? string.Join(", ", mutation.Tags)
+                : "No specific compatibility info available";
+            
+            Debug.LogWarning(
+                $"Mutation '{mutation.MutationName}' is not compatible with {piece.Type} at {piece.Position}. " +
+                $"This mutation may be designed for specific piece types. Tags: [{compatibleTypes}]"
+            );
+        }
+
+        private void HandleStacking(Piece piece, Mutation mutation)
+        {
+            if (mutation.CanStack)
             {
-                instance = null;
+                int currentStacks = mutationStacks[piece][mutation];
+                if (currentStacks < mutation.MaxStacks)
+                {
+                    mutationStacks[piece][mutation]++;
+                    Debug.Log($"Stacked '{mutation.MutationName}' on {piece.Type} (Stack: {mutationStacks[piece][mutation]})");
+                    
+                    // Reapply for stack bonus
+                    mutation.ApplyToPiece(piece);
+                    OnMutationApplied?.Invoke(piece, mutation);
+                }
+                else
+                {
+                    Debug.LogWarning($"Mutation '{mutation.MutationName}' is already at max stacks ({mutation.MaxStacks}).");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Mutation '{mutation.MutationName}' is already applied and cannot stack.");
             }
         }
+
+        private void UnlockInCodex(Mutation mutation)
+        {
+            if (GlobalDataManager.Instance != null)
+            {
+                GlobalDataManager.Instance.UnlockMutation(mutation.MutationName);
+            }
+        }
+        #endregion
     }
 }

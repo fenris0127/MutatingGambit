@@ -10,6 +10,7 @@ namespace MutatingGambit.Core.ChessEngine
     /// </summary>
     public static class BoardFactory
     {
+        #region 공개 메서드
         /// <summary>
         /// Creates standard chess piece data for a team.
         /// </summary>
@@ -77,5 +78,6 @@ namespace MutatingGambit.Core.ChessEngine
 
             return piece;
         }
+        #endregion
     }
 }

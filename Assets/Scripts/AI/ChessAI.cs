@@ -11,6 +11,7 @@ namespace MutatingGambit.AI
     /// </summary>
     public class ChessAI : MonoBehaviour
     {
+        #region 설정 및 변수
         [Header("AI Configuration")]
         [SerializeField]
         private AIConfig config;
@@ -25,7 +26,9 @@ namespace MutatingGambit.AI
         private int nodesEvaluated = 0;
         private float searchStartTime = 0f;
         private bool timeExpired = false;
+        #endregion
 
+        #region 속성
         /// <summary>
         /// Gets the AI's team.
         /// </summary>
@@ -35,7 +38,19 @@ namespace MutatingGambit.AI
         /// Gets the AI configuration.
         /// </summary>
         public AIConfig Config => config;
+        #endregion
 
+        #region Unity 생명주기
+        private void Awake()
+        {
+            if (config != null && stateEvaluator == null)
+            {
+                Initialize(config, aiTeam);
+            }
+        }
+        #endregion
+
+        #region 공개 메서드
         /// <summary>
         /// Initializes the AI with configuration.
         /// </summary>
@@ -49,14 +64,6 @@ namespace MutatingGambit.AI
             moveEvaluator = new MoveEvaluator(config, stateEvaluator, team);
 
             Debug.Log($"ChessAI initialized: Team={team}, Depth={config.SearchDepth}, Time={config.MaxTimePerMove}ms");
-        }
-
-        private void Awake()
-        {
-            if (config != null && stateEvaluator == null)
-            {
-                Initialize(config, aiTeam);
-            }
         }
 
         /// <summary>
@@ -90,7 +97,9 @@ namespace MutatingGambit.AI
 
             return bestMove;
         }
+        #endregion
 
+        #region 비공개 메서드
         /// <summary>
         /// Iterative deepening search - searches incrementally deeper until time runs out.
         /// </summary>
@@ -344,9 +353,8 @@ namespace MutatingGambit.AI
         /// <summary>
         /// Randomly decides whether to choose a move with equal evaluation.
         /// </summary>
-        private bool ShouldChooseRandomly()
-        {
-            return config.RandomnessFactor > 0 && random.NextDouble() < config.RandomnessFactor;
-        }
+        private bool ShouldChooseRandomly() => 
+            config.RandomnessFactor > 0 && random.NextDouble() < config.RandomnessFactor;
+        #endregion
     }
 }

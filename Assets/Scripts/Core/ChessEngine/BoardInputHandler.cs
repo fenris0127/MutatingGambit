@@ -6,6 +6,7 @@ namespace MutatingGambit.Core.ChessEngine
 {
     public class BoardInputHandler : MonoBehaviour
     {
+        #region 변수
         [SerializeField]
         private Board board;
 
@@ -22,7 +23,9 @@ namespace MutatingGambit.Core.ChessEngine
         private List<Vector2Int> highlightedMoves = new List<Vector2Int>();
 
         private const int LeftMouseButton = 0;
+        #endregion
 
+        #region Unity 생명주기
         private void Start()
         {
             if (board == null) board = FindObjectOfType<Board>();
@@ -42,11 +45,11 @@ namespace MutatingGambit.Core.ChessEngine
                 HandleInput();
             }
         }
+        #endregion
 
-        private bool IsPlayerTurn()
-        {
-            return gameManager.CurrentTurn == gameManager.PlayerTeam && gameManager.State == GameManager.GameState.PlayerTurn;
-        }
+        #region 비공개 메서드
+        private bool IsPlayerTurn() => 
+            gameManager.CurrentTurn == gameManager.PlayerTeam && gameManager.State == GameManager.GameState.PlayerTurn;
 
         private void HandleInput()
         {
@@ -64,10 +67,8 @@ namespace MutatingGambit.Core.ChessEngine
             }
         }
 
-        private Vector2Int GetGridPosition(Vector2 worldPos)
-        {
-            return new Vector2Int(Mathf.RoundToInt(worldPos.x), Mathf.RoundToInt(worldPos.y));
-        }
+        private Vector2Int GetGridPosition(Vector2 worldPos) => 
+            new Vector2Int(Mathf.RoundToInt(worldPos.x), Mathf.RoundToInt(worldPos.y));
 
         private void HandleClick(Vector2Int gridPos)
         {
@@ -171,5 +172,6 @@ namespace MutatingGambit.Core.ChessEngine
             activeHighlights.Clear();
             highlightedMoves.Clear();
         }
+        #endregion
     }
 }
