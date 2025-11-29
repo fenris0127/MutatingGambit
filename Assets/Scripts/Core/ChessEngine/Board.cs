@@ -12,6 +12,8 @@ namespace MutatingGambit.Core.ChessEngine
     /// </summary>
     public class Board : MonoBehaviour, IBoard
     {
+        private static Board instance;
+
         #region 변수
         [SerializeField]
         private int width = 8;
@@ -41,6 +43,18 @@ namespace MutatingGambit.Core.ChessEngine
         #endregion
 
         #region 속성
+        public static Board Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = Board.Instance;
+                }
+                return instance;
+            }
+        }
+
         /// <summary>
         /// 이 보드의 아티팩트 관리자를 가져옵니다.
         /// </summary>

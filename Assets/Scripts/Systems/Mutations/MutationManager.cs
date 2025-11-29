@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using MutatingGambit.Core.ChessEngine;
@@ -14,13 +15,17 @@ namespace MutatingGambit.Systems.Mutations
         private Dictionary<Piece, List<Mutation>> pieceMutations = new Dictionary<Piece, List<Mutation>>();
         private MutationApplicator applicator;
 
+        // 이벤트
+        public event Action<Piece, Mutation> OnMutationApplied;
+        public event Action<Piece, Mutation> OnMutationRemoved;
+
         public static MutationManager Instance
         {
             get
             {
                 if (instance == null)
                 {
-                    instance = FindObjectOfType<MutationManager>();
+                    instance = MutationManager.Instance;
                 }
                 return instance;
             }
@@ -68,11 +73,12 @@ namespace MutatingGambit.Systems.Mutations
             if (piece == null || mutation == null) return;
 
             RegisterPiece(piece);
-            
+
             if (!pieceMutations[piece].Contains(mutation))
             {
                 applicator.ApplyMutation(piece, mutation);
                 pieceMutations[piece].Add(mutation);
+                OnMutationApplied?.Invoke(piece, mutation);
             }
         }
 
@@ -87,6 +93,7 @@ namespace MutatingGambit.Systems.Mutations
             {
                 applicator.RemoveMutation(piece, mutation);
                 pieceMutations[piece].Remove(mutation);
+                OnMutationRemoved?.Invoke(piece, mutation);
             }
         }
 
@@ -103,6 +110,46 @@ namespace MutatingGambit.Systems.Mutations
         }
 
         /// <summary>
+        /// 기물의 변이 목록을 가져옵니다. (별칭)
+        /// </summary>
+        public List<Mutation> GetMutations(Piece piece)
+        {
+            return GetMutationsForPiece(piece);
+        }
+
+        /// <summary>
+        /// 기물에 변이가 있는지 확인합니다.
+        /// </summary>
+        public bool HasMutations(Piece piece)
+        {
+            return piece != null && pieceMutations.ContainsKey(piece) && pieceMutations[piece].Count > 0;
+        }
+
+        /// <summary>
+        /// 기물에 특정 변이가 있는지 확인합니다.
+        /// </summary>
+        public bool HasMutation(Piece piece, Mutation mutation)
+        {
+            return piece != null && mutation != null &&
+                   pieceMutations.ContainsKey(piece) &&
+                   pieceMutations[piece].Contains(mutation);
+        }
+
+        /// <summary>
+        /// 기물의 모든 변이를 제거합니다.
+        /// </summary>
+        public void ClearMutations(Piece piece)
+        {
+            if (piece == null || !pieceMutations.ContainsKey(piece)) return;
+
+            var mutations = new List<Mutation>(pieceMutations[piece]);
+            foreach (var mutation in mutations)
+            {
+                RemoveMutation(piece, mutation);
+            }
+        }
+
+        /// <summary>
         /// 기물 이동 시 변이에 알립니다.
         /// </summary>
         public void NotifyMove(Piece piece, Vector2Int from, Vector2Int to, Board board)
@@ -111,7 +158,7 @@ namespace MutatingGambit.Systems.Mutations
 
             foreach (var mutation in pieceMutations[piece])
             {
-                mutation.OnPieceMoved(piece, from,to, board);
+                mutation.OnMove(piece, from, to, board);
             }
         }
 
@@ -124,7 +171,7 @@ namespace MutatingGambit.Systems.Mutations
             {
                 foreach (var mutation in pieceMutations[attacker])
                 {
-                    mutation.OnPieceCaptured(attacker, captured, from, to, board);
+                    mutation.OnCapture(attacker, captured, from, to, board);
                 }
             }
         }

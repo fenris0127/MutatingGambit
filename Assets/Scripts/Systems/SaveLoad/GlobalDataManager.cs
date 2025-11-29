@@ -69,9 +69,9 @@ namespace MutatingGambit.Systems.SaveLoad
             };
 
             // Record pieces
-            foreach (var piece in playerState.Pieces)
+            foreach (var piece in playerState.PlayerPieces)
             {
-                record.FinalPieceTypes.Add(piece.pieceType.ToString());
+                record.FinalPieceTypes.Add(piece.type.ToString());
                 foreach (var mut in piece.mutations)
                 {
                     if (!record.FinalMutations.Contains(mut.MutationName))

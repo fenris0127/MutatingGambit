@@ -26,7 +26,7 @@ namespace MutatingGambit.Tests
 
             // Create mutation manager
             mutationManager = MutationManager.Instance;
-            mutationManager.Reset();
+            mutationManager.ClearAll();
         }
 
         [TearDown]
@@ -39,7 +39,7 @@ namespace MutatingGambit.Tests
 
             if (mutationManager != null)
             {
-                mutationManager.Reset();
+                mutationManager.ClearAll();
             }
         }
 

@@ -46,8 +46,12 @@ namespace MutatingGambit.Systems.Dungeon
                 var brokenPieces = repairSystem.GetBrokenPiecesByTeam(state.PlayerTeam);
                 foreach (var brokenPiece in brokenPieces)
                 {
-                    var pieceState = CreatePieceState(brokenPiece);
-                    state.BrokenPieces.Add(pieceState);
+                    var piece = brokenPiece.GetComponent<Piece>();
+                    if (piece != null)
+                    {
+                        var pieceState = CreatePieceState(piece);
+                        state.BrokenPieces.Add(pieceState);
+                    }
                 }
             }
 

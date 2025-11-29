@@ -35,8 +35,6 @@ namespace MutatingGambit.Systems.Mutations
         {
             SpawnPawn(fromPos, mutatedPiece.Team, board);
         }
-
-        public override bool IsCompatibleWith(PieceType pieceType) => pieceType == PieceType.Knight;
         #endregion
 
         #region 비공개 메서드

@@ -28,6 +28,14 @@ namespace MutatingGambit.Systems.Mutations
         }
 
         /// <summary>
+        /// Gets a mutation by its ID (name).
+        /// </summary>
+        public Mutation GetMutationById(string id)
+        {
+            return GetMutationByName(id);
+        }
+
+        /// <summary>
         /// Gets mutations by rarity.
         /// </summary>
         public List<Mutation> GetMutationsByRarity(MutationRarity rarity)

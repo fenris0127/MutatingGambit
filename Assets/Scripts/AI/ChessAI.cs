@@ -41,7 +41,7 @@ namespace MutatingGambit.AI
             random = seed == 0 ? new System.Random() : new System.Random(seed);
 
             stateEvaluator = new StateEvaluator(config, team, seed);
-            moveEvaluator = new MoveEvaluator(stateEvaluator, config);
+            moveEvaluator = new MoveEvaluator(config, stateEvaluator, team);
             minimaxSearch = new MinimaxSearch(config, team, stateEvaluator, random);
             moveSelector = new MoveSelector(config, random);
 
@@ -112,7 +112,7 @@ namespace MutatingGambit.AI
             
             if (moveEvaluator != null)
             {
-                moveEvaluator = new MoveEvaluator(stateEvaluator, config);
+                moveEvaluator = new MoveEvaluator(config, stateEvaluator, aiTeam);
             }
 
             if (minimaxSearch != null)

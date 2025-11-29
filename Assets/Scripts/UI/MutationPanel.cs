@@ -37,7 +37,7 @@ namespace MutatingGambit.UI
             // Cache board reference if not assigned
             if (board == null)
             {
-                board = FindObjectOfType<Board>();
+                board = Board.Instance;
             }
 
             if (titleText != null)

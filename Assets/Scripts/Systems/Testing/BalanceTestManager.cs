@@ -48,10 +48,10 @@ namespace MutatingGambit.Systems.Testing
 
         private void Start()
         {
-            gameManager = FindObjectOfType<GameManager>();
-            board = FindObjectOfType<Board>();
+            gameManager = GameManager.Instance;
+            board = Board.Instance;
             mutationManager = MutationManager.Instance;
-            artifactManager = FindObjectOfType<ArtifactManager>();
+            artifactManager = ArtifactManager.Instance;
         }
 
         /// <summary>
@@ -186,9 +186,9 @@ namespace MutatingGambit.Systems.Testing
         private void ApplyConfiguration(Team team, List<Mutation> mutations, List<Artifact> artifacts)
         {
             // Clear existing
-            // This requires more robust MutationManager methods to clear by team, 
+            // This requires more robust MutationManager methods to clear by team,
             // but for MVP we can just assume we clear everything at start of game.
-            if (team == Team.White) mutationManager.Reset(); 
+            if (team == Team.White) mutationManager.ClearAll(); 
             
             // Apply Mutations
             var pieces = board.GetPiecesByTeam(team);

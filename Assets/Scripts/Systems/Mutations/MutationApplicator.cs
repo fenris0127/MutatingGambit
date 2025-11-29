@@ -21,7 +21,7 @@ namespace MutatingGambit.Systems.Mutations
             }
 
             mutation.ApplyToPiece(piece);
-            Debug.Log($"{piece.name}에 변이 적용: {mutation.mutationName}");
+            Debug.Log($"{piece.name}에 변이 적용: {mutation.MutationName}");
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace MutatingGambit.Systems.Mutations
             }
 
             mutation.RemoveFromPiece(piece);
-            Debug.Log($"{piece.name}에서 변이 제거: {mutation.mutationName}");
+            Debug.Log($"{piece.name}에서 변이 제거: {mutation.MutationName}");
         }
 
         /// <summary>

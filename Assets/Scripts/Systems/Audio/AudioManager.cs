@@ -26,7 +26,7 @@ namespace MutatingGambit.Systems.Audio
         private void Start()
         {
             // Cache references if not assigned
-            if (board == null) board = FindObjectOfType<Board>();
+            if (board == null) board = Board.Instance;
             if (gameManager == null) gameManager = GameManager.Instance;
 
             if (board != null)

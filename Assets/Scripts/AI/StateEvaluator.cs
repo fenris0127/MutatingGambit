@@ -88,7 +88,7 @@ namespace MutatingGambit.AI
             score += positionalEvaluator.EvaluatePositionState(state) * config.PositionalWeight;
 
             // 킹 안전
-            score += kingSafetyEvaluator.Evalu ateKingSafetyState(state) * config.KingSafetyWeight;
+            score += kingSafetyEvaluator.EvaluateKingSafetyState(state) * config.KingSafetyWeight;
 
             // 기동성
             score += mobilityEvaluator.EvaluateMobilityState(state) * config.MobilityWeight;

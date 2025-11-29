@@ -49,7 +49,7 @@ namespace MutatingGambit.UI
             {
                 if (instance == null)
                 {
-                    instance = FindObjectOfType<TooltipManager>();
+                    instance = TooltipManager.Instance;
 
                     if (instance == null)
                     {

@@ -46,12 +46,12 @@ namespace MutatingGambit.Core.ChessEngine
 
             if (board == null)
             {
-                board = FindObjectOfType<Board>();
+                board = Board.Instance;
             }
 
             if (gameManager == null)
             {
-                gameManager = FindObjectOfType<GameManager>();
+                gameManager = GameManager.Instance;
             }
         }
 
@@ -96,7 +96,8 @@ namespace MutatingGambit.Core.ChessEngine
         private Vector2Int GetGridPosition()
         {
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-            if (Physics2D.Raycast(ray.origin, ray.direction, out RaycastHit2D hit))
+            RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+            if (hit.collider != null)
             {
                 Vector3 hitPoint = hit.point;
                 return new Vector2Int(Mathf.FloorToInt(hitPoint.x), Mathf.FloorToInt(hitPoint.y));

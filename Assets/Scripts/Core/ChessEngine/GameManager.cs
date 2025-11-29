@@ -29,6 +29,8 @@ namespace MutatingGambit.Core.ChessEngine
         [SerializeField] private Team playerTeam = Team.White;
         [SerializeField] private GameState state = GameState.NotStarted;
 
+        private bool simulationMode = false;
+
         [Header("Events")]
         public UnityEvent OnVictory;
         public UnityEvent OnDefeat;
@@ -49,7 +51,7 @@ namespace MutatingGambit.Core.ChessEngine
             {
                 if (instance == null)
                 {
-                    instance = FindObjectOfType<GameManager>();
+                    instance = GameManager.Instance;
                 }
                 return instance;
             }
@@ -60,6 +62,7 @@ namespace MutatingGambit.Core.ChessEngine
         public Team PlayerTeam => playerTeam;
         public int TurnNumber => turnManager != null ? turnManager.TurnNumber : 0;
         public bool IsPlayerTurn => turnManager != null && turnManager.IsPlayerTurn;
+        public bool SimulationMode { get => simulationMode; set => simulationMode = value; }
 
         private void Awake()
         {
@@ -212,9 +215,9 @@ namespace MutatingGambit.Core.ChessEngine
 
         private void InitializeComponents()
         {
-            if (board == null) board = FindObjectOfType<Board>();
+            if (board == null) board = Board.Instance;
             if (turnIndicator == null) turnIndicator = FindObjectOfType<TurnIndicator>();
-            if (turn Manager == null) turnManager = GetComponent<TurnManager>();
+            if (turnManager == null) turnManager = GetComponent<TurnManager>();
             if (victoryChecker == null) victoryChecker = GetComponent<VictoryConditionChecker>();
         }
 

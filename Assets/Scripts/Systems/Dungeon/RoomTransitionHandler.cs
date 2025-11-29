@@ -13,7 +13,7 @@ namespace MutatingGambit.Systems.Dungeon
         [Header("References")]
         [SerializeField] private Board gameBoard;
         [SerializeField] private RoomManager roomManager;
-        [SerializeField] private RepairSystem repair System;
+        [SerializeField] private RepairSystem repairSystem;
         [SerializeField] private GameManager gameManager;
         [SerializeField] private GameObject piecePrefab;
 

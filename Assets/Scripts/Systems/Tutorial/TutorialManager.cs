@@ -40,7 +40,7 @@ namespace MutatingGambit.Systems.Tutorial
 
         private void Start()
         {
-            if (board == null) board = FindObjectOfType<Board>();
+            if (board == null) board = Board.Instance;
             if (tutorialUI == null) tutorialUI = FindObjectOfType<TutorialUI>();
 
             // Subscribe to board events
@@ -167,6 +167,25 @@ namespace MutatingGambit.Systems.Tutorial
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Called when a piece is selected.
+        /// </summary>
+        public void OnPieceSelected(Piece piece)
+        {
+            // Tutorial logic for piece selection can be added here
+            if (!isTutorialActive) return;
+
+            TutorialStep step = CurrentStep;
+            if (step != null && step.restrictMovement && step.requiredMoveFrom.x >= 0)
+            {
+                // Validate if the correct piece was selected
+                if (piece != null && piece.Position != step.requiredMoveFrom)
+                {
+                    Debug.Log("Tutorial: Please select the highlighted piece.");
+                }
+            }
         }
     }
 }

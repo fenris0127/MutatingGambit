@@ -38,7 +38,7 @@ namespace MutatingGambit.Tests.PlayMode
             Object.Destroy(gameContext);
             if (MutationManager.Instance != null)
             {
-                MutationManager.Instance.Reset();
+                MutationManager.Instance.ClearAll();
             }
         }
 
@@ -67,9 +67,9 @@ namespace MutatingGambit.Tests.PlayMode
             state.SaveBoardState(board, null);
             
             // Assert: Mutation is saved in state
-            Assert.IsTrue(state.Pieces.Count > 0);
-            Assert.IsTrue(state.Pieces[0].mutations.Count > 0);
-            Assert.AreEqual("TestMutation", state.Pieces[0].mutations[0].name);
+            Assert.IsTrue(state.PlayerPieces.Count > 0);
+            Assert.IsTrue(state.PlayerPieces[0].mutations.Count > 0);
+            Assert.AreEqual("TestMutation", state.PlayerPieces[0].mutations[0].name);
 
             yield return null;
         }

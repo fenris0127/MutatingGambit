@@ -26,7 +26,7 @@ namespace MutatingGambit.UI
         {
             if (board == null)
             {
-                board = FindObjectOfType<Board>();
+                board = Board.Instance;
             }
 
             if (board != null)
