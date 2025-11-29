@@ -4,7 +4,7 @@ using MutatingGambit.Core.ChessEngine;
 namespace MutatingGambit.AI
 {
     /// <summary>
-    /// Represents a chess move.
+    /// 체스 수를 나타냅니다.
     /// </summary>
     public struct Move
     {
@@ -31,7 +31,7 @@ namespace MutatingGambit.AI
     }
 
     /// <summary>
-    /// Evaluates individual moves and assigns scores.
+    /// 개별 수를 평가하고 점수를 할당합니다.
     /// </summary>
     public class MoveEvaluator
     {
@@ -50,7 +50,7 @@ namespace MutatingGambit.AI
         }
 
         /// <summary>
-        /// Evaluates a move by simulating it and scoring the resulting board state.
+        /// 수를 시뮬레이션하고 결과 보드 상태를 평가하여 수를 평가합니다.
         /// </summary>
         public float EvaluateMove(Board board, Move move)
         {
@@ -59,28 +59,28 @@ namespace MutatingGambit.AI
                 return 0f;
             }
 
-            // Create lightweight state to simulate move
+            // 수를 시뮬레이션하기 위한 경량 상태 생성
             BoardState clonedState = board.CloneAsState();
 
-            // Execute move on cloned state
+            // 복제된 상태에서 수 실행
             clonedState.SimulateMove(move.From, move.To);
 
-            // Evaluate resulting position
+            // 결과 위치 평가
             float score = stateEvaluator.EvaluateBoardState(clonedState);
 
-            // Bonus for captures
+            // 포획 보너스
             if (move.CapturedPiece != null)
             {
                 score += config.GetPieceValue(move.CapturedPiece.Type) * 0.1f;
             }
 
-            // Bonus for center control moves
+            // 중앙 지배 수 보너스
             if (IsControllingCenter(move.To, board.Width, board.Height))
             {
                 score += 0.2f;
             }
 
-            // Bonus for moving pieces forward (offensive play)
+            // 전진하는 기물 보너스 (공격적인 플레이)
             int forwardDirection = aiTeam == Team.White ? 1 : -1;
             int yDelta = (move.To.y - move.From.y) * forwardDirection;
             if (yDelta > 0)
@@ -94,14 +94,14 @@ namespace MutatingGambit.AI
 
         #region 비공개 메서드
         /// <summary>
-        /// Checks if a position controls the center of the board.
+        /// 위치가 보드의 중앙을 지배하는지 확인합니다.
         /// </summary>
         private bool IsControllingCenter(Vector2Int position, int boardWidth, int boardHeight)
         {
             int centerX = boardWidth / 2;
             int centerY = boardHeight / 2;
 
-            // Check if within center 4 squares
+            // 중앙 4칸 내에 있는지 확인
             return (position.x == centerX - 1 || position.x == centerX) &&
                    (position.y == centerY - 1 || position.y == centerY);
         }

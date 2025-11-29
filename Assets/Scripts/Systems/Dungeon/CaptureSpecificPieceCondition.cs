@@ -4,7 +4,7 @@ using MutatingGambit.Core.ChessEngine;
 namespace MutatingGambit.Systems.Dungeon
 {
     /// <summary>
-    /// Victory condition: Capture a specific enemy piece.
+    /// 승리 조건: 특정 적 기물을 잡습니다.
     /// </summary>
     [CreateAssetMenu(fileName = "CaptureSpecificPiece", menuName = "Victory Conditions/Capture Specific Piece")]
     public class CaptureSpecificPieceCondition : VictoryCondition
@@ -12,15 +12,15 @@ namespace MutatingGambit.Systems.Dungeon
         #region 변수
         [Header("Target")]
         [SerializeField]
-        [Tooltip("The type of piece that must be captured.")]
+        [Tooltip("잡아야 하는 기물의 종류.")]
         private PieceType targetPieceType = PieceType.Queen;
 
         [SerializeField]
-        [Tooltip("The starting position of the target piece (for identification).")]
+        [Tooltip("목표 기물의 시작 위치 (식별용).")]
         private Vector2Int targetStartPosition;
 
         [SerializeField]
-        [Tooltip("If true, any piece of the target type counts. If false, must be at specific position.")]
+        [Tooltip("true인 경우 목표 종류의 모든 기물이 해당됩니다. false인 경우 특정 위치에 있어야 합니다.")]
         private bool anyOfType = true;
 
         private bool targetCaptured = false;
@@ -28,7 +28,7 @@ namespace MutatingGambit.Systems.Dungeon
 
         #region 속성
         /// <summary>
-        /// Gets the target piece type.
+        /// 목표 기물 타입을 가져옵니다.
         /// </summary>
         public PieceType TargetPieceType => targetPieceType;
         #endregion
@@ -44,14 +44,14 @@ namespace MutatingGambit.Systems.Dungeon
             Team enemyTeam = playerTeam == Team.White ? Team.Black : Team.White;
             var enemyPieces = board.GetPiecesByTeam(enemyTeam);
 
-            // Check if target piece still exists
+            // 목표 기물이 아직 존재하는지 확인
             bool targetExists = false;
 
             foreach (var piece in enemyPieces)
             {
                 if (anyOfType)
                 {
-                    // Any piece of this type
+                    // 이 타입의 모든 기물
                     if (piece.Type == targetPieceType)
                     {
                         targetExists = true;
@@ -60,7 +60,7 @@ namespace MutatingGambit.Systems.Dungeon
                 }
                 else
                 {
-                    // Specific piece at position
+                    // 위치의 특정 기물
                     if (piece.Type == targetPieceType && piece.Position == targetStartPosition)
                     {
                         targetExists = true;
@@ -69,7 +69,7 @@ namespace MutatingGambit.Systems.Dungeon
                 }
             }
 
-            // Victory if target no longer exists (was captured)
+            // 목표가 더 이상 존재하지 않으면 승리 (잡힘)
             targetCaptured = !targetExists;
             return targetCaptured;
         }
@@ -77,12 +77,12 @@ namespace MutatingGambit.Systems.Dungeon
         public override bool IsDefeatConditionMet(Board board, int currentTurn, Team playerTeam) => false;
 
         public override string GetProgressString(Board board, int currentTurn, Team playerTeam) => 
-            targetCaptured ? $"Target {targetPieceType} captured!" : $"Capture enemy {targetPieceType}";
+            targetCaptured ? $"목표 {targetPieceType} 잡음!" : $"적 {targetPieceType}를 잡으세요";
 
         public override void Reset() => targetCaptured = false;
 
         /// <summary>
-        /// Sets the target piece parameters.
+        /// 목표 기물 매개변수를 설정합니다.
         /// </summary>
         public void SetTarget(PieceType type, Vector2Int position, bool anyType = true)
         {

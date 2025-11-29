@@ -1,12 +1,12 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using MutatingGambit.Core.MovementRules;
 
 namespace MutatingGambit.Core.ChessEngine
 {
     /// <summary>
-    /// Lightweight board state for AI simulation without GameObject overhead.
-    /// This is a pure data structure that doesn't inherit from MonoBehaviour.
+    /// GameObject 오버헤드 없이 AI 시뮬레이션을 위한 경량 보드 상태.
+    /// MonoBehaviour를 상속하지 않는 순수 데이터 구조입니다.
     /// </summary>
     public class BoardState : IBoard
     {
@@ -16,7 +16,7 @@ namespace MutatingGambit.Core.ChessEngine
         private bool[,] obstacles;
 
         /// <summary>
-        /// Lightweight piece data for simulation.
+        /// 시뮬레이션을 위한 경량 기물 데이터.
         /// </summary>
         public class PieceData : IPiece
         {
@@ -25,7 +25,7 @@ namespace MutatingGambit.Core.ChessEngine
             public Vector2Int Position { get; set; }
             public List<MovementRule> MovementRules { get; set; }
 
-            // IPiece implementation
+            // IPiece 구현
             Team IPiece.Team => Team;
             PieceType IPiece.Type => Type;
             Vector2Int IPiece.Position => Position;
@@ -66,13 +66,13 @@ namespace MutatingGambit.Core.ChessEngine
         }
 
         /// <summary>
-        /// Creates a BoardState from an existing Board.
+        /// 기존 Board에서 BoardState를 생성합니다.
         /// </summary>
         public static BoardState FromBoard(Board board)
         {
             var state = new BoardState(board.Width, board.Height);
 
-            // Copy obstacles
+            // 장애물 복사
             for (int x = 0; x < board.Width; x++)
             {
                 for (int y = 0; y < board.Height; y++)
@@ -81,7 +81,7 @@ namespace MutatingGambit.Core.ChessEngine
                 }
             }
 
-            // Copy pieces
+            // 기물 복사
             var allPieces = board.GetAllPieces();
             foreach (var piece in allPieces)
             {
@@ -96,13 +96,13 @@ namespace MutatingGambit.Core.ChessEngine
         }
 
         /// <summary>
-        /// Creates a deep copy of this board state.
+        /// 이 보드 상태의 깊은 복사본을 생성합니다.
         /// </summary>
         public BoardState Clone()
         {
             var clone = new BoardState(width, height);
 
-            // Copy obstacles
+            // 장애물 복사
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
@@ -147,7 +147,7 @@ namespace MutatingGambit.Core.ChessEngine
         }
 
         /// <summary>
-        /// Simulates a move on this board state.
+        /// 이 보드 상태에서 수를 시뮬레이션합니다.
         /// </summary>
         public bool SimulateMove(Vector2Int from, Vector2Int to)
         {
@@ -158,10 +158,10 @@ namespace MutatingGambit.Core.ChessEngine
             if (piece == null)
                 return false;
 
-            // Remove from old position
+            // 이전 위치에서 제거
             pieces[from.x, from.y] = null;
 
-            // Place at new position (removing any piece there)
+            // 새 위치에 배치 (그곳에 있는 기물 제거)
             pieces[to.x, to.y] = piece;
             piece.Position = to;
 
@@ -169,7 +169,7 @@ namespace MutatingGambit.Core.ChessEngine
         }
 
         /// <summary>
-        /// Gets all pieces on the board.
+        /// 보드의 모든 기물을 가져옵니다.
         /// </summary>
         public List<PieceData> GetAllPieceData()
         {
@@ -188,7 +188,7 @@ namespace MutatingGambit.Core.ChessEngine
         }
 
         /// <summary>
-        /// Gets all pieces belonging to a specific team.
+        /// 특정 팀에 속한 모든 기물을 가져옵니다.
         /// </summary>
         public List<PieceData> GetPiecesByTeam(Team team)
         {
@@ -207,7 +207,7 @@ namespace MutatingGambit.Core.ChessEngine
         }
 
         /// <summary>
-        /// Gets all valid moves for a piece using its movement rules.
+        /// 움직임 규칙을 사용하여 기물의 모든 유효한 수를 가져옵니다.
         /// </summary>
         public List<Vector2Int> GetValidMoves(PieceData piece)
         {
@@ -228,15 +228,17 @@ namespace MutatingGambit.Core.ChessEngine
             return allMoves;
         }
 
-        // IBoard implementation (for movement rule compatibility)
+        // IBoard 구현 (움직임 규칙 호환성을 위해)
         IPiece IBoard.GetPieceAt(Vector2Int position)
         {
             var pieceData = GetPieceData(position);
             if (pieceData == null) return null;
 
-            // Return PieceData as IPiece (PieceData implements IPiece below)
+            // PieceData를 IPiece로 반환 (PieceData가 IPiece 구현)
             return pieceData;
         }
+
+        public IPiece GetPieceAt(Vector2Int position) => GetPieceData(position);
 
         bool IBoard.IsObstacle(Vector2Int position)
         {

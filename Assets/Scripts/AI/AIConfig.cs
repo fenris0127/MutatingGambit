@@ -1,9 +1,9 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MutatingGambit.AI
 {
     /// <summary>
-    /// Configuration for AI difficulty and behavior.
+    /// AI 난이도와 행동에 대한 설정.
     /// </summary>
     [CreateAssetMenu(fileName = "AIConfig", menuName = "Mutating Gambit/AI Config")]
     public class AIConfig : ScriptableObject
@@ -18,42 +18,42 @@ namespace MutatingGambit.AI
 
         [Header("Search Settings")]
         [SerializeField]
-        [Tooltip("Maximum depth for minimax search.")]
+        [Tooltip("미니맥스 탐색의 최대 깊이.")]
         [Range(1, 6)]
         private int searchDepth = 3;
 
         [SerializeField]
-        [Tooltip("Maximum time per move in milliseconds.")]
+        [Tooltip("수당 최대 시간 (밀리초).")]
         private int maxTimePerMove = 500;
 
         [SerializeField]
-        [Tooltip("If true, uses iterative deepening.")]
+        [Tooltip("true인 경우 반복 심화를 사용합니다.")]
         private bool useIterativeDeepening = true;
 
         [Header("Evaluation Weights")]
         [SerializeField]
-        [Tooltip("Weight for material advantage (piece values).")]
+        [Tooltip("물질적 이점 (기물 가치)에 대한 가중치.")]
         [Range(0f, 10f)]
         private float materialWeight = 1.0f;
 
         [SerializeField]
-        [Tooltip("Weight for positional advantage.")]
+        [Tooltip("위치적 이점에 대한 가중치.")]
         [Range(0f, 5f)]
         private float positionalWeight = 0.3f;
 
         [SerializeField]
-        [Tooltip("Weight for king safety.")]
+        [Tooltip("킹 안전에 대한 가중치.")]
         [Range(0f, 5f)]
         private float kingSafetyWeight = 0.5f;
 
         [SerializeField]
-        [Tooltip("Weight for mobility (number of valid moves).")]
+        [Tooltip("기동성 (유효한 수의 수)에 대한 가중치.")]
         [Range(0f, 5f)]
         private float mobilityWeight = 0.2f;
 
         [Header("Randomness")]
         [SerializeField]
-        [Tooltip("Adds randomness to evaluation to prevent deterministic play.")]
+        [Tooltip("결정론적 플레이를 방지하기 위해 평가에 무작위성을 추가합니다.")]
         [Range(0f, 1f)]
         private float randomnessFactor = 0.1f;
 
@@ -77,57 +77,57 @@ namespace MutatingGambit.AI
         private float kingValue = 100.0f;
 
         /// <summary>
-        /// Gets the configuration name.
+        /// 설정 이름.
         /// </summary>
         public string ConfigName => configName;
 
         /// <summary>
-        /// Gets the description.
+        /// 설명.
         /// </summary>
         public string Description => description;
 
         /// <summary>
-        /// Gets the search depth.
+        /// 탐색 깊이.
         /// </summary>
         public int SearchDepth => searchDepth;
 
         /// <summary>
-        /// Gets the maximum time per move in milliseconds.
+        /// 수당 최대 시간 (밀리초).
         /// </summary>
         public int MaxTimePerMove => maxTimePerMove;
 
         /// <summary>
-        /// Gets whether to use iterative deepening.
+        /// 반복 심화를 사용하는지 여부를 가져옵니다.
         /// </summary>
         public bool UseIterativeDeepening => useIterativeDeepening;
 
         /// <summary>
-        /// Gets the material weight.
+        /// 물질 가중치.
         /// </summary>
         public float MaterialWeight => materialWeight;
 
         /// <summary>
-        /// Gets the positional weight.
+        /// 위치 가중치.
         /// </summary>
         public float PositionalWeight => positionalWeight;
 
         /// <summary>
-        /// Gets the king safety weight.
+        /// 킹 안전 가중치.
         /// </summary>
         public float KingSafetyWeight => kingSafetyWeight;
 
         /// <summary>
-        /// Gets the mobility weight.
+        /// 기동성 가중치.
         /// </summary>
         public float MobilityWeight => mobilityWeight;
 
         /// <summary>
-        /// Gets the randomness factor.
+        /// 무작위성 인자.
         /// </summary>
         public float RandomnessFactor => randomnessFactor;
 
         /// <summary>
-        /// Gets the value of a piece type.
+        /// 기물 타입의 가치를 가져옵니다.
         /// </summary>
         public float GetPieceValue(Core.ChessEngine.PieceType type)
         {
@@ -151,7 +151,7 @@ namespace MutatingGambit.AI
         }
 
         /// <summary>
-        /// Returns a string representation for debugging.
+        /// 디버깅을 위한 문자열 표현을 반환합니다.
         /// </summary>
         public override string ToString()
         {
@@ -160,8 +160,8 @@ namespace MutatingGambit.AI
 
 #if UNITY_INCLUDE_TESTS
         /// <summary>
-        /// Creates an AIConfig instance for testing with custom values.
-        /// Avoids fragile reflection-based initialization.
+        /// 사용자 정의 값으로 테스트용 AIConfig 인스턴스를 생성합니다.
+        /// 취약한 리플렉션 기반 초기화를 방지합니다.
         /// </summary>
         public static AIConfig CreateForTesting(
             int searchDepth = 3,

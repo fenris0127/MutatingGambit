@@ -4,7 +4,7 @@ using MutatingGambit.Core.ChessEngine;
 namespace MutatingGambit.Systems.Mutations
 {
     /// <summary>
-    /// Splitting Knight Mutation: When knight captures, spawns a pawn at its original position.
+    /// 분열하는 나이트 변이: 나이트가 잡을 때 원래 위치에 폰을 생성합니다.
     /// </summary>
     [CreateAssetMenu(fileName = "SplittingKnightMutation", menuName = "Mutations/Initial/Splitting Knight")]
     public class SplittingKnightMutation : Mutation
@@ -12,7 +12,7 @@ namespace MutatingGambit.Systems.Mutations
         #region 변수
         [Header("Spawn Settings")]
         [SerializeField]
-        [Tooltip("Prefab for the pawn to spawn. If null, will use the board's default spawn method.")]
+        [Tooltip("생성할 폰의 프리팹. null인 경우 보드의 기본 생성 방법을 사용합니다.")]
         private GameObject pawnPrefab;
         #endregion
 
@@ -21,14 +21,14 @@ namespace MutatingGambit.Systems.Mutations
         {
             if (piece.Type != PieceType.Knight)
             {
-                Debug.LogWarning("SplittingKnightMutation can only be applied to Knights.");
+                Debug.LogWarning("SplittingKnightMutation은 나이트에만 적용할 수 있습니다.");
                 return;
             }
         }
 
         public override void RemoveFromPiece(Piece piece)
         {
-            // No cleanup needed
+            // 정리 불필요
         }
 
         public override void OnCapture(Piece mutatedPiece, Piece capturedPiece, Vector2Int fromPos, Vector2Int toPos, Board board)
@@ -41,13 +41,13 @@ namespace MutatingGambit.Systems.Mutations
 
         #region 비공개 메서드
         /// <summary>
-        /// Spawns a pawn at the specified position.
+        /// 지정된 위치에 폰을 생성합니다.
         /// </summary>
         private void SpawnPawn(Vector2Int position, Team team, Board board)
         {
             if (!board.IsPositionValid(position) || board.GetPiece(position) != null)
             {
-                Debug.LogWarning($"SplittingKnight: Cannot spawn pawn at {position}, invalid or occupied.");
+                Debug.LogWarning($"SplittingKnight: {position}에 폰을 생성할 수 없습니다. 유효하지 않거나 점유되어 있습니다.");
                 return;
             }
 
@@ -65,7 +65,7 @@ namespace MutatingGambit.Systems.Mutations
                 board.SpawnPiece(PieceType.Pawn, team, position);
             }
             
-            Debug.Log($"SplittingKnight: Spawned pawn at {position}");
+            Debug.Log($"SplittingKnight: {position}에 폰 생성");
         }
         #endregion
     }

@@ -6,13 +6,13 @@ using MutatingGambit.Systems.Mutations;
 namespace MutatingGambit.Core.ChessEngine
 {
     /// <summary>
-    /// Factory class for creating board setups and pieces.
+    /// 보드 설정과 기물 생성을 위한 팩토리 클래스.
     /// </summary>
     public static class BoardFactory
     {
         #region 공개 메서드
         /// <summary>
-        /// Creates standard chess piece data for a team.
+        /// 팀을 위한 표준 체스 기물 데이터를 생성합니다.
         /// </summary>
         public static List<PieceStateData> CreateStandardChessPieces(Team team)
         {
@@ -20,7 +20,7 @@ namespace MutatingGambit.Core.ChessEngine
             int backRow = team == Team.White ? 0 : 7;
             int pawnRow = team == Team.White ? 1 : 6;
 
-            // Back row
+            // 뒷줄
             pieces.Add(new PieceStateData(PieceType.Rook, team, new Vector2Int(0, backRow)));
             pieces.Add(new PieceStateData(PieceType.Knight, team, new Vector2Int(1, backRow)));
             pieces.Add(new PieceStateData(PieceType.Bishop, team, new Vector2Int(2, backRow)));
@@ -30,7 +30,7 @@ namespace MutatingGambit.Core.ChessEngine
             pieces.Add(new PieceStateData(PieceType.Knight, team, new Vector2Int(6, backRow)));
             pieces.Add(new PieceStateData(PieceType.Rook, team, new Vector2Int(7, backRow)));
 
-            // Pawns
+            // 폰
             for (int x = 0; x < 8; x++)
             {
                 pieces.Add(new PieceStateData(PieceType.Pawn, team, new Vector2Int(x, pawnRow)));
@@ -40,7 +40,7 @@ namespace MutatingGambit.Core.ChessEngine
         }
 
         /// <summary>
-        /// Creates a piece GameObject from piece state data.
+        /// 기물 상태 데이터로부터 기물 GameObject를 생성합니다.
         /// </summary>
         public static Piece CreatePieceFromData(PieceStateData data, GameObject piecePrefab)
         {
@@ -64,7 +64,7 @@ namespace MutatingGambit.Core.ChessEngine
 
             piece.Initialize(data.pieceType, data.team, data.position);
 
-            // Restore mutations
+            // 변이 복원
             if (data.mutations != null)
             {
                 foreach (var mutation in data.mutations)

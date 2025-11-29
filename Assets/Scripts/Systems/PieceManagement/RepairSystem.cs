@@ -7,19 +7,19 @@ using MutatingGambit.Systems.Dungeon;
 namespace MutatingGambit.Systems.PieceManagement
 {
     /// <summary>
-    /// Manages the repair system for broken pieces.
-    /// Tracks broken pieces and handles repair logic.
+    /// 부서진 기물의 수리 시스템을 관리합니다.
+    /// 부서진 기물을 추적하고 수리 로직을 처리합니다.
     /// </summary>
     public class RepairSystem : MonoBehaviour
     {
         #region 변수
         [Header("Settings")]
         [SerializeField]
-        [Tooltip("Maximum number of pieces that can be repaired per rest room visit.")]
+        [Tooltip("휴식 방문 당 수리할 수 있는 최대 기물 수.")]
         private int maxRepairsPerRest = 2;
 
         [SerializeField]
-        [Tooltip("Whether repairing pieces costs resources.")]
+        [Tooltip("기물 수리에 자원이 필요한지 여부.")]
         private bool usesRepairCost = false;
 
         [Header("State")]
@@ -40,34 +40,34 @@ namespace MutatingGambit.Systems.PieceManagement
 
         #region 속성
         /// <summary>
-        /// Gets the list of broken pieces.
+        /// 부서진 기물 목록을 가져옵니다.
         /// </summary>
         public List<PieceHealth> BrokenPieces => new List<PieceHealth>(brokenPieces);
 
         /// <summary>
-        /// Gets the list of active pieces.
+        /// 활성 기물 목록을 가져옵니다.
         /// </summary>
         public List<PieceHealth> ActivePieces => new List<PieceHealth>(activePieces);
 
         /// <summary>
-        /// Gets the number of broken pieces.
+        /// 부서진 기물의 수를 가져옵니다.
         /// </summary>
         public int BrokenPieceCount => brokenPieces.Count;
 
         /// <summary>
-        /// Gets the remaining repairs available this rest.
+        /// 이번 휴식에서 남은 수리 횟수를 가져옵니다.
         /// </summary>
         public int RepairsRemaining => Mathf.Max(0, maxRepairsPerRest - repairsUsedThisRest);
 
         /// <summary>
-        /// Gets whether any repairs are available.
+        /// 수리가 가능한지 여부를 가져옵니다.
         /// </summary>
         public bool CanRepair => RepairsRemaining > 0;
         #endregion
 
         #region 공개 메서드
         /// <summary>
-        /// Registers a piece with the repair system.
+        /// 수리 시스템에 기물을 등록합니다.
         /// </summary>
         public void RegisterPiece(PieceHealth pieceHealth)
         {
@@ -91,13 +91,13 @@ namespace MutatingGambit.Systems.PieceManagement
                 }
             }
 
-            // Subscribe to state changes
+            // 상태 변경 구독
             pieceHealth.OnPieceBroken.AddListener(() => HandlePieceBroken(pieceHealth));
             pieceHealth.OnPieceRepaired.AddListener(() => HandlePieceRepaired(pieceHealth));
         }
 
         /// <summary>
-        /// Unregisters a piece from the repair system.
+        /// 수리 시스템에서 기물 등록을 취소합니다.
         /// </summary>
         public void UnregisterPiece(PieceHealth pieceHealth)
         {
@@ -109,14 +109,13 @@ namespace MutatingGambit.Systems.PieceManagement
             brokenPieces.Remove(pieceHealth);
             activePieces.Remove(pieceHealth);
             
-            // Note: We can't easily unsubscribe anonymous delegates (lambdas). 
-            // In a more robust system, we'd use method groups or a wrapper, 
-            // but for now, relying on Unity's event system cleanup when objects are destroyed is acceptable 
-            // if the PieceHealth component is destroyed with the piece.
+            // 참고: 익명 델리게이트(람다)는 쉽게 구독 취소할 수 없습니다.
+            // 더 견고한 시스템에서는 메서드 그룹이나 래퍼를 사용하지만,
+            // 지금은 기물과 함께 PieceHealth 컴포넌트가 파괴될 때 Unity의 이벤트 시스템 정리에 의존합니다.
         }
 
         /// <summary>
-        /// Marks a piece as broken and adds it to the broken list.
+        /// 기물을 부서진 것으로 표시하고 부서진 목록에 추가합니다.
         /// </summary>
         public void BreakPiece(PieceHealth pieceHealth)
         {
@@ -126,27 +125,27 @@ namespace MutatingGambit.Systems.PieceManagement
             }
 
             pieceHealth.BreakPiece();
-            // Event handler will move it to broken list
+            // 이벤트 핸들러가 부서진 목록으로 이동
         }
 
         /// <summary>
-        /// Attempts to repair a piece.
+        /// 기물을 수리하려고 시도합니다.
         /// </summary>
         public bool RepairPiece(PieceHealth pieceHealth, PlayerState playerState = null)
         {
             if (pieceHealth == null || !pieceHealth.CanBeRepaired)
             {
-                Debug.LogWarning("Cannot repair this piece!");
+                Debug.LogWarning("이 기물을 수리할 수 없습니다!");
                 return false;
             }
 
             if (RepairsRemaining <= 0)
             {
-                Debug.LogWarning("No repairs remaining for this rest!");
+                Debug.LogWarning("이번 휴식에 남은 수리 횟수가 없습니다!");
                 return false;
             }
 
-            // Check repair cost (if using currency system)
+            // 수리 비용 확인 (화폐 시스템 사용 시)
             if (usesRepairCost && pieceHealth.RepairCost > 0)
             {
                 if (playerState != null)
@@ -154,19 +153,19 @@ namespace MutatingGambit.Systems.PieceManagement
                     if (playerState.Currency >= pieceHealth.RepairCost)
                     {
                         playerState.Currency -= pieceHealth.RepairCost;
-                        Debug.Log($"Paid {pieceHealth.RepairCost} for repair. Remaining: {playerState.Currency}");
+                        Debug.Log($"수리 비용 {pieceHealth.RepairCost} 지불. 남은 금액: {playerState.Currency}");
                     }
                     else
                     {
-                        Debug.LogWarning("Not enough currency to repair!");
+                        Debug.LogWarning("수리하기에 화폐가 부족합니다!");
                         return false;
                     }
                 }
                 else
                 {
-                    Debug.LogWarning("Cannot check currency - PlayerState not provided.");
-                    // Depending on design, might want to return false here or allow free repair if state is missing.
-                    // For safety, let's fail if cost is required but state is missing.
+                    Debug.LogWarning("화폐를 확인할 수 없습니다 - PlayerState가 제공되지 않았습니다.");
+                    // 디자인에 따라 여기서 false를 반환하거나 상태가 없으면 무료 수리를 허용할 수 있습니다.
+                    // 안전을 위해 비용이 필요하지만 상태가 없으면 실패합니다.
                     return false; 
                 }
             }
@@ -177,33 +176,33 @@ namespace MutatingGambit.Systems.PieceManagement
             {
                 repairsUsedThisRest++;
                 OnRepairsAvailableChanged?.Invoke(RepairsRemaining);
-                // Event handler will move it back to active list
+                // 이벤트 핸들러가 활성 목록으로 다시 이동
             }
 
             return repaired;
         }
 
         /// <summary>
-        /// Called when entering a rest room - resets repair count.
+        /// 휴식 방에 들어갈 때 호출됩니다 - 수리 횟수를 재설정합니다.
         /// </summary>
         public void EnterRestRoom()
         {
             repairsUsedThisRest = 0;
             OnRepairsAvailableChanged?.Invoke(RepairsRemaining);
 
-            Debug.Log($"Entered rest room. {maxRepairsPerRest} repairs available.");
+            Debug.Log($"휴식 방에 입장했습니다. {maxRepairsPerRest}번의 수리가 가능합니다.");
         }
 
         /// <summary>
-        /// Called when exiting a rest room.
+        /// 휴식 방에서 나갈 때 호출됩니다.
         /// </summary>
         public void ExitRestRoom()
         {
-            Debug.Log($"Exited rest room. Used {repairsUsedThisRest}/{maxRepairsPerRest} repairs.");
+            Debug.Log($"휴식 방에서 나왔습니다. {repairsUsedThisRest}/{maxRepairsPerRest}번의 수리를 사용했습니다.");
         }
 
         /// <summary>
-        /// Checks if the king is broken (game over condition).
+        /// 킹이 부서졌는지 확인합니다 (게임 오버 조건).
         /// </summary>
         public bool IsKingBroken(Team team)
         {
@@ -221,7 +220,7 @@ namespace MutatingGambit.Systems.PieceManagement
         }
 
         /// <summary>
-        /// Gets all broken pieces for a specific team.
+        /// 특정 팀의 부서진 기물을 모두 가져옵니다.
         /// </summary>
         public List<PieceHealth> GetBrokenPiecesByTeam(Team team)
         {
@@ -239,7 +238,7 @@ namespace MutatingGambit.Systems.PieceManagement
         }
 
         /// <summary>
-        /// Gets save data for all broken pieces.
+        /// 부서진 모든 기물의 저장 데이터를 가져옵니다.
         /// </summary>
         public List<PieceHealthData> GetSaveData()
         {
@@ -260,7 +259,7 @@ namespace MutatingGambit.Systems.PieceManagement
         }
 
         /// <summary>
-        /// Clears all tracked pieces.
+        /// 추적 중인 모든 기물을 제거합니다.
         /// </summary>
         public void Clear()
         {
@@ -270,15 +269,15 @@ namespace MutatingGambit.Systems.PieceManagement
         }
 
         /// <summary>
-        /// Gets statistics about piece health.
+        /// 기물 체력에 대한 통계를 가져옵니다.
         /// </summary>
         public string GetStats() => 
-            $"Active: {activePieces.Count}, Broken: {brokenPieces.Count}, Repairs Left: {RepairsRemaining}";
+            $"활성: {activePieces.Count}, 부서짐: {brokenPieces.Count}, 남은 수리: {RepairsRemaining}";
         #endregion
 
         #region 비공개 메서드
         /// <summary>
-        /// Handles a piece breaking.
+        /// 기물이 부서졌을 때 처리합니다.
         /// </summary>
         private void HandlePieceBroken(PieceHealth pieceHealth)
         {
@@ -294,11 +293,11 @@ namespace MutatingGambit.Systems.PieceManagement
 
             OnPieceBroken?.Invoke(pieceHealth);
 
-            Debug.Log($"Piece broken. Broken count: {brokenPieces.Count}");
+            Debug.Log($"기물이 부서졌습니다. 부서진 기물 수: {brokenPieces.Count}");
         }
 
         /// <summary>
-        /// Handles a piece being repaired.
+        /// 기물이 수리되었을 때 처리합니다.
         /// </summary>
         private void HandlePieceRepaired(PieceHealth pieceHealth)
         {
@@ -314,7 +313,7 @@ namespace MutatingGambit.Systems.PieceManagement
 
             OnPieceRepaired?.Invoke(pieceHealth);
 
-            Debug.Log($"Piece repaired. Broken count: {brokenPieces.Count}");
+            Debug.Log($"기물이 수리되었습니다. 부서진 기물 수: {brokenPieces.Count}");
         }
         #endregion
     }

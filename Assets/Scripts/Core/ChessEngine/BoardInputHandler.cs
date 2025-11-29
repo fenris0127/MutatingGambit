@@ -1,46 +1,63 @@
-using System.Collections.Generic;
 using UnityEngine;
 using MutatingGambit.Systems.Tutorial;
 
 namespace MutatingGambit.Core.ChessEngine
 {
+    /// <summary>
+    /// 플레이어 입력을 처리하고 기물 선택 및 이동을 관리합니다.
+    /// </summary>
     public class BoardInputHandler : MonoBehaviour
     {
         #region 변수
+        private const int LEFT_MOUSE_BUTTON = 0;
+
+        [Header("References")]
         [SerializeField]
         private Board board;
 
         [SerializeField]
         private GameManager gameManager;
 
-        [Header("Visualization")]
+        [SerializeField]
+        private Camera mainCamera;
+
+        [Header("Visual Feedback")]
         [SerializeField]
         private GameObject highlightPrefab;
 
-        private Piece selectedPiece;
-        private Camera mainCamera;
-        private List<GameObject> activeHighlights = new List<GameObject>();
-        private List<Vector2Int> highlightedMoves = new List<Vector2Int>();
+        [SerializeField]
+        private Color validMoveColor = Color.green;
 
-        private const int LeftMouseButton = 0;
+        [SerializeField]
+        private Color selectedColor = Color.yellow;
+
+        private Piece selectedPiece;
+        private Vector2Int selectedPosition;
+        private GameObject[] highlightObjects = new GameObject[0];
         #endregion
 
         #region Unity 생명주기
         private void Start()
         {
-            if (board == null) board = FindObjectOfType<Board>();
-            if (gameManager == null) gameManager = FindObjectOfType<GameManager>();
-            mainCamera = Camera.main;
+            if (mainCamera == null)
+            {
+                mainCamera = Camera.main;
+            }
+
+            if (board == null)
+            {
+                board = FindObjectOfType<Board>();
+            }
+
+            if (gameManager == null)
+            {
+                gameManager = FindObjectOfType<GameManager>();
+            }
         }
 
         private void Update()
         {
-            if (!IsPlayerTurn())
-            {
-                return;
-            }
-
-            if (Input.GetMouseButtonDown(LeftMouseButton))
+            if (Input.GetMouseButtonDown(LEFT_MOUSE_BUTTON))
             {
                 HandleInput();
             }
@@ -48,129 +65,150 @@ namespace MutatingGambit.Core.ChessEngine
         #endregion
 
         #region 비공개 메서드
-        private bool IsPlayerTurn() => 
-            gameManager.CurrentTurn == gameManager.PlayerTeam && gameManager.State == GameManager.GameState.PlayerTurn;
+        /// <summary>
+        /// 현재 플레이어 턴인지 확인합니다.
+        /// </summary>
+        private bool IsPlayerTurn() => gameManager.CurrentTurn == Team.White;
 
+        /// <summary>
+        /// 마우스 입력을 처리하고 기물을 선택하거나 이동합니다.
+        /// </summary>
         private void HandleInput()
         {
-            Vector2 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+            if (!IsPlayerTurn()) return;
 
-            if (hit.collider != null)
-            {
-                Vector2Int gridPos = GetGridPosition(hit.point);
-                
-                if (board.IsPositionValid(gridPos))
-                {
-                    HandleClick(gridPos);
-                }
-            }
-        }
-
-        private Vector2Int GetGridPosition(Vector2 worldPos) => 
-            new Vector2Int(Mathf.RoundToInt(worldPos.x), Mathf.RoundToInt(worldPos.y));
-
-        private void HandleClick(Vector2Int gridPos)
-        {
-            Piece clickedPiece = board.GetPiece(gridPos);
+            Vector2Int gridPosition = GetGridPosition();
+            if (!board.IsPositionValid(gridPosition)) return;
 
             if (selectedPiece == null)
             {
-                TrySelectPiece(clickedPiece);
+                TrySelectPiece(gridPosition);
             }
             else
             {
-                if (clickedPiece != null && clickedPiece.Team == gameManager.PlayerTeam)
-                {
-                    ChangeSelection(clickedPiece);
-                }
-                else
-                {
-                    TryMovePiece(gridPos);
-                }
-            }
-        }
-
-        private void TrySelectPiece(Piece piece)
-        {
-            if (piece != null && piece.Team == gameManager.PlayerTeam)
-            {
-                SelectPiece(piece);
-            }
-        }
-
-        private void ChangeSelection(Piece newPiece)
-        {
-            ClearHighlights();
-            SelectPiece(newPiece);
-        }
-
-        private void SelectPiece(Piece piece)
-        {
-            selectedPiece = piece;
-            highlightedMoves = selectedPiece.GetValidMoves(board);
-            HighlightMoves(highlightedMoves);
-            Debug.Log($"Selected {selectedPiece}");
-        }
-
-        private void TryMovePiece(Vector2Int targetPos)
-        {
-            if (TutorialManager.Instance != null && !TutorialManager.Instance.IsMoveAllowed(selectedPiece.Position, targetPos))
-            {
-                Debug.Log("Move restricted by tutorial");
-                return;
-            }
-
-            bool success = gameManager.ExecuteMove(selectedPiece.Position, targetPos);
-            if (success)
-            {
-                ClearHighlights();
-                selectedPiece = null;
-            }
-            else
-            {
-                Debug.Log("Invalid move");
+                TryMovePiece(gridPosition);
             }
         }
 
         /// <summary>
-        /// Highlights the given positions on the board.
+        /// 마우스 위치를 그리드 좌표로 변환합니다.
         /// </summary>
-        private void HighlightMoves(List<Vector2Int> positions)
+        private Vector2Int GetGridPosition()
         {
-            ClearHighlights();
-
-            if (highlightPrefab == null)
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            if (Physics2D.Raycast(ray.origin, ray.direction, out RaycastHit2D hit))
             {
-                foreach (var pos in positions)
-                {
-                    Debug.Log($"Highlighting position: {pos}");
-                }
-                return;
+                Vector3 hitPoint = hit.point;
+                return new Vector2Int(Mathf.FloorToInt(hitPoint.x), Mathf.FloorToInt(hitPoint.y));
             }
+            return new Vector2Int(-1, -1);
+        }
 
-            foreach (var pos in positions)
+        /// <summary>
+        /// 지정된 위치에서 기물을 선택하려고 시도합니다.
+        /// </summary>
+        private void TrySelectPiece(Vector2Int position)
+        {
+            Piece piece = board.GetPiece(position);
+
+            if (piece != null && piece.Team == Team.White)
             {
-                Vector3 worldPos = new Vector3(pos.x, pos.y, 0); 
-                GameObject highlight = Instantiate(highlightPrefab, worldPos, Quaternion.identity);
-                activeHighlights.Add(highlight);
+                selectedPiece = piece;
+                selectedPosition = position;
+
+                ShowValidMoves();
+
+                // 튜토리얼 통합
+                if (TutorialManager.Instance != null)
+                {
+                    TutorialManager.Instance.OnPieceSelected(piece);
+                }
             }
         }
 
         /// <summary>
-        /// Clears all move highlights.
+        /// 선택된 기물을 목표 위치로 이동하려고 시도합니다.
+        /// </summary>
+        private void TryMovePiece(Vector2Int targetPosition)
+        {
+            var validMoves = MoveValidator.GetValidMoves(board, selectedPosition);
+
+            if (validMoves.Contains(targetPosition))
+            {
+                gameManager.ExecuteMove(selectedPosition, targetPosition);
+                ClearSelection();
+            }
+            else
+            {
+                ClearSelection();
+            }
+        }
+
+        /// <summary>
+        /// 선택된 기물의 유효한 이동을 시각적으로 표시합니다.
+        /// </summary>
+        private void ShowValidMoves()
+        {
+            ClearHighlights();
+
+            if (selectedPiece == null) return;
+
+            var validMoves = MoveValidator.GetValidMoves(board, selectedPosition);
+
+            highlightObjects = new GameObject[validMoves.Count + 1];
+
+            // 선택된 기물 강조 표시
+            highlightObjects[0] = CreateHighlight(selectedPosition, selectedColor);
+
+            // 유효한 이동 강조 표시
+            for (int i = 0; i < validMoves.Count; i++)
+            {
+                highlightObjects[i + 1] = CreateHighlight(validMoves[i], validMoveColor);
+            }
+        }
+
+        /// <summary>
+        /// 지정된 위치에 강조 표시 객체를 생성합니다.
+        /// </summary>
+        private GameObject CreateHighlight(Vector2Int position, Color color)
+        {
+            if (highlightPrefab == null) return null;
+
+            GameObject highlight = Instantiate(highlightPrefab);
+            highlight.transform.position = new Vector3(position.x + 0.5f, position.y + 0.5f, 0);
+
+            var renderer = highlight.GetComponent<SpriteRenderer>();
+            if (renderer != null)
+            {
+                renderer.color = color;
+            }
+
+            return highlight;
+        }
+
+        /// <summary>
+        /// 모든 강조 표시 객체를 제거합니다.
         /// </summary>
         private void ClearHighlights()
         {
-            foreach (var highlight in activeHighlights)
+            foreach (var highlight in highlightObjects)
             {
                 if (highlight != null)
                 {
                     Destroy(highlight);
                 }
             }
-            activeHighlights.Clear();
-            highlightedMoves.Clear();
+            highlightObjects = new GameObject[0];
+        }
+
+        /// <summary>
+        /// 기물 선택 및 강조 표시를 지웁니다.
+        /// </summary>
+        private void ClearSelection()
+        {
+            selectedPiece = null;
+            selectedPosition = new Vector2Int(-1, -1);
+            ClearHighlights();
         }
         #endregion
     }
