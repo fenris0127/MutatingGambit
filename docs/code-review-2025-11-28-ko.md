@@ -2760,7 +2760,7 @@ public class ValidationResponse
 ```csharp
 public static class InputValidator
 {
-    private static readonly Regex ValidNamePattern = new Regex(@"^[a-zA-Z0-9가-힣\s]{1,20}$");
+    private static readonly Regex ValidNamePattern = new Regex(@"^[a-zA-Z0-9가-힣s]{1,20}$");
 
     public static bool IsValidPlayerName(string name)
     {

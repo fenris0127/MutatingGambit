@@ -101,7 +101,7 @@ namespace MutatingGambit.UI
         {
             if (detailsText != null)
             {
-                detailsText.text = $"<b>{name}</b>\n\n{desc}";
+                detailsText.text = $"<b>{name}</b>nn{desc}";
             }
         }
 

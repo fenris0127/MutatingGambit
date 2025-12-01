@@ -180,20 +180,20 @@ namespace MutatingGambit.Systems.Artifacts
         /// </summary>
         public static string GenerateTooltip(Artifact artifact, bool includePrice = false, int currentFloor = 1)
         {
-            var tooltip = $"<b>{artifact.ArtifactName}</b>\n";
-            tooltip += $"<color=#{ColorUtility.ToHtmlStringRGB(GetRarityColor(artifact.Rarity))}>{artifact.Rarity}</color>\n\n";
-            tooltip += $"{artifact.Description}\n\n";
+            var tooltip = $"<b>{artifact.ArtifactName}</b>n";
+            tooltip += $"<color=#{ColorUtility.ToHtmlStringRGB(GetRarityColor(artifact.Rarity))}>{artifact.Rarity}</color>nn";
+            tooltip += $"{artifact.Description}nn";
             tooltip += $"<i>Trigger: {GetTriggerDisplayName(artifact.Trigger)}</i>";
             
             if (artifact.Tags != null && artifact.Tags.Length > 0)
             {
-                tooltip += $"\nTags: {string.Join(", ", artifact.Tags.Select(GetTagDisplayName))}";
+                tooltip += $"nTags: {string.Join(", ", artifact.Tags.Select(GetTagDisplayName))}";
             }
 
             if (includePrice)
             {
                 int price = CalculateShopPrice(artifact, currentFloor);
-                tooltip += $"\n\nPrice: {price} Gold";
+                tooltip += $"nnPrice: {price} Gold";
             }
 
             return tooltip;

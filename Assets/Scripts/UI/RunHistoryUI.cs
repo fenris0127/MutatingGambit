@@ -41,8 +41,8 @@ namespace MutatingGambit.UI
                 string resultColor = run.IsVictory ? "green" : "red";
                 string resultText = run.IsVictory ? "VICTORY" : "DEFEAT";
                 
-                text.text = $"<color={resultColor}>{resultText}</color> - {run.Date}\n" +
-                            $"Floor {run.FloorsCleared}-{run.RoomsCleared} | Score: {run.FinalScore}\n" +
+                text.text = $"<color={resultColor}>{resultText}</color> - {run.Date}n" +
+                            $"Floor {run.FloorsCleared}-{run.RoomsCleared} | Score: {run.FinalScore}n" +
                             $"Artifacts: {run.CollectedArtifacts.Count} | Mutations: {run.FinalMutations.Count}";
             }
         }

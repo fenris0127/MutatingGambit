@@ -250,10 +250,10 @@ namespace MutatingGambit.Systems.Artifacts
                 return "ArtifactManager (no active artifacts)";
             }
 
-            var result = $"ArtifactManager ({activeArtifacts.Count} artifacts):\n";
+            var result = $"ArtifactManager ({activeArtifacts.Count} artifacts):n";
             foreach (var artifact in activeArtifacts)
             {
-                result += $"  - {artifact.ArtifactName}\n";
+                result += $"  - {artifact.ArtifactName}n";
             }
             return result;
         }
