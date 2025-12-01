@@ -7,64 +7,100 @@
 ### Screen Layout Structure (1920x1080 기준)
 
 #### 1. 중앙 보드 영역 (Center Board Area)
-- **위치**: 화면 중앙 (360, 100) ~ (1560, 980)
-- **크기**: 1200x880px
+- **Anchors Preset**: Center (중앙 고정)
+- **Pos X**: 0, **Pos Y**: -50
+- **Width**: 1200, **Height**: 880
 - **내용**: 8x8 체스보드
 - **인터랙션**: 클릭으로 기물 선택 및 이동
 
-#### 2. 왼쪽 사이드바 (Left Sidebar) - 360px width
+#### 2. 왼쪽 사이드바 (Left Sidebar)
+- **Anchors Preset**: Top Left (점)
+  - Anchors: Min (0, 1), Max (0, 1)
+- **Pivot**: (0, 1)
+- **Pos X**: 10
+- **Pos Y**: -10
+- **Pos Z**: 0
+- **Width**: 340
+- **Height**: 1060
+- **Layout**: Vertical Layout Group 권장
+
 **A. Player Pieces Panel** (상단)
-- **위치**: (10, 10) ~ (350, 250)
-- **내용**:
-  - 살아있는 기물 아이콘 (8개)
-  - 파손된 기물 아이콘 (빨간 테두리 표시)
-  - 각 기물 위에 마우스 오버 시 적용된 Mutation 툴팁 표시
+- **Anchors Preset**: Top (Stretch) - 부모 내에서 상단
+- **Left**: 0
+- **Top**: 0
+- **Pos Z**: 0
+- **Right**: 0
+- **Height**: 240
 
 **B. Active Mutations Panel** (중앙)
-- **위치**: (10, 260) ~ (350, 550)
-- **내용**:
-  - 현재 활성화된 Mutation 리스트 (3-5개)
-  - 각 Mutation: 아이콘 + 이름 + 간단한 설명
-  - 마우스 오버로 상세 설명 표시
-- **스타일**: 카드 형태, 보라색 그라데이션 배경
+- **Anchors Preset**: Top (Stretch) - 부모 내에서 상단
+- **Left**: 0
+- **Top**: 250
+- **Pos Z**: 0
+- **Right**: 0
+- **Height**: 290
 
 **C. Currency Display** (하단)
-- **위치**: (10, 560) ~ (350, 620)
-- **내용**: 골드/화폐 아이콘 + 숫자
+- **Anchors Preset**: Bottom (Stretch) - 부모 내에서 하단
+- **Left**: 0
+- **Bottom**: 0
+- **Pos Z**: 0
+- **Right**: 0
+- **Height**: 60
 
-#### 3. 오른쪽 사이드바 (Right Sidebar) - 360px width
+#### 3. 오른쪽 사이드바 (Right Sidebar)
+- **Anchors Preset**: Top Right (점)
+  - Anchors: Min (1, 1), Max (1, 1)
+- **Pivot**: (1, 1)
+- **Pos X**: -10
+- **Pos Y**: -10
+- **Pos Z**: 0
+- **Width**: 340
+- **Height**: 1060
+- **Layout**: Vertical Layout Group 권장
+
 **A. Artifacts Panel** (상단)
-- **위치**: (1570, 10) ~ (1910, 280)
-- **내용**:
-  - 획득한 Artifact 아이콘들 (2-4개)
-  - 각 Artifact 툴팁으로 효과 설명
-- **스타일**: 황금색 테두리
+- **Anchors Preset**: Top (Stretch) - 부모 내에서 상단
+- **Left**: 0
+- **Top**: 0
+- **Pos Z**: 0
+- **Right**: 0
+- **Height**: 270
 
 **B. Move History Panel** (중앙)
-- **위치**: (1570, 290) ~ (1910, 650)
-- **내용**:
-  - 스크롤 가능한 이동 기록
-  - 대수학 표기법 (e.g., "1. e4 e5", "2. Nf3 Nc6")
-  - 최근 5-10개 이동 표시
+- **Anchors Preset**: Top (Stretch) - 부모 내에서 상단
+- **Left**: 0
+- **Top**: 280
+- **Pos Z**: 0
+- **Right**: 0
+- **Height**: 360
 
 **C. Victory Condition Panel** (하단)
-- **위치**: (1570, 660) ~ (1910, 800)
-- **내용**:
-  - 현재 방의 승리 조건 (예: "적 킹을 파괴하라", "5턴 안에 체크메이트")
-  - 진행도 표시 (해당되는 경우)
+- **Anchors Preset**: Bottom (Stretch) - 부모 내에서 하단
+- **Left**: 0
+- **Bottom**: 0
+- **Pos Z**: 0
+- **Right**: 0
+- **Height**: 140
 
 #### 4. 상단 바 (Top Bar)
 **A. Turn Indicator** (중앙)
-- **위치**: (760, 10) ~ (1160, 80)
+- **Anchors Preset**: Top (Center) - 상단 중앙
+- **Pos X**: 0, **Pos Y**: -10
+- **Width**: 400, **Height**: 70
 - **내용**: "White's Turn" / "Black's Turn" + 턴 번호
 - **스타일**: 팀 색상으로 강조 (White: 밝은 배경, Black: 어두운 배경)
 
 **B. Pause/Settings Button** (우측상단)
-- **위치**: (1870, 10) ~ (1910, 50)
+- **Anchors Preset**: Top Right (우측 상단 고정)
+- **Pos X**: -370, **Pos Y**: -10
+- **Width**: 40, **Height**: 40
 - **아이콘**: ⚙️ 또는 ⏸️
 
 #### 5. 하단 액션 바 (Bottom Action Bar) - 선택사항
-- **위치**: (360, 1000) ~ (1560, 1070)
+- **Anchors Preset**: Bottom (Center) - 하단 중앙
+- **Pos X**: 0, **Pos Y**: 10
+- **Width**: 1200, **Height**: 70
 - **내용**: 특수 능력 버튼, 턴 종료 버튼 등
 
 ---
