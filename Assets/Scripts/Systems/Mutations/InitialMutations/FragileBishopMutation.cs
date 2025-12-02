@@ -6,6 +6,8 @@ using System.Collections.Generic;
 namespace MutatingGambit.Systems.Mutations
 {
     /// <summary>
+    /// 연약한 비숍 변이: 비숍이 정확히 3칸만 대각선으로 이동합니다 (그 이상도 이하도 아님).
+    /// PRD에서는 "유리 비숍"으로도 알려져 있습니다.
     /// Fragile Bishop Mutation: Bishop moves exactly 3 squares diagonally (no more, no less).
     /// Also known as "Glass Bishop" in the PRD.
     /// </summary>
@@ -65,6 +67,7 @@ namespace MutatingGambit.Systems.Mutations
     }
 
     /// <summary>
+    /// 정확히 3칸 이동을 요구하는 대각선 이동 규칙입니다.
     /// Diagonal movement rule that requires exactly 3 squares of movement.
     /// </summary>
     public class FixedDiagonalRule : MovementRule

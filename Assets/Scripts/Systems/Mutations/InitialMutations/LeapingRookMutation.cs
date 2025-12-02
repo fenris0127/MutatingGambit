@@ -6,6 +6,7 @@ using System.Collections.Generic;
 namespace MutatingGambit.Systems.Mutations
 {
     /// <summary>
+    /// 도약하는 룩 변이: 룩이 아군 기물 하나를 뛰어넘을 수 있습니다.
     /// Leaping Rook Mutation: Rook can jump over ONE friendly piece.
     /// </summary>
     [CreateAssetMenu(fileName = "LeapingRookMutation", menuName = "Mutations/Initial/Leaping Rook")]
@@ -40,6 +41,8 @@ namespace MutatingGambit.Systems.Mutations
     }
 
     /// <summary>
+    /// 도약하는 룩을 위한 커스텀 이동 규칙입니다.
+    /// 직선상에서 아군 기물 하나를 뛰어넘을 수 있습니다.
     /// Custom movement rule for leaping rook.
     /// Allows jumping over one friendly piece in straight lines.
     /// </summary>

@@ -153,7 +153,7 @@ namespace MutatingGambit.Systems.Dungeon
 
             if (MutationManager.Instance != null)
             {
-                var mutations = MutationManager.Instance.GetMutationsForPiece(piece);
+                var mutations = MutationManager.Instance.GetMutations(piece);
                 pieceState.mutations.AddRange(mutations);
             }
 

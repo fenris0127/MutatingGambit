@@ -8,7 +8,8 @@
       "Bash(for f in BloodMoonArtifact.cs PhoenixFeatherArtifact.cs MagneticFieldArtifact.cs TimeWarpArtifact.cs GravityMirrorArtifact.cs CavalryChargeArtifact.cs KingsShadowArtifact.cs AdvancedArtifacts.cs AdditionalArtifacts.cs)",
       "Bash(do sed -i '3i using ChessBoard = MutatingGambit.Core.ChessEngine.Board;' \"$f\")",
       "Bash(done)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(if exist \"D:\\New Unity Project\\MutatingGambit\\Assets\\Scripts\\Systems\\Mutations\\MutationApplicator.cs.meta\" rm \"D:\\New Unity Project\\MutatingGambit\\Assets\\Scripts\\Systems\\Mutations\\MutationApplicator.cs.meta\")"
     ],
     "deny": [],
     "ask": []

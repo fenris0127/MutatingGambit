@@ -182,5 +182,54 @@ namespace MutatingGambit.Systems.Mutations
         {
             return $"Mutation: {mutationName}";
         }
+
+        #region MovementRule Tracking Helpers
+
+        /// <summary>
+        /// MovementRule을 추가하고 MutationState에서 추적합니다
+        /// 제거 시 자동으로 정리하기 위해 반드시 이 메서드를 사용하세요
+        /// </summary>
+        /// <param name="piece">Rule을 추가할 Piece</param>
+        /// <param name="rule">추가할 MovementRule</param>
+        protected void AddAndTrackRule(Piece piece, MovementRule rule)
+        {
+            if (piece == null || rule == null)
+            {
+                Debug.LogWarning($"[{mutationName}] Cannot add null rule or to null piece");
+                return;
+            }
+
+            var state = MutationManager.Instance.GetMutationState(piece, this);
+            if (state == null)
+            {
+                Debug.LogError($"[{mutationName}] MutationState not found for piece {piece.name}");
+                return;
+            }
+
+            piece.AddMovementRule(rule);
+            state.TrackRule(rule);
+        }
+
+        /// <summary>
+        /// MutationState에 추적된 모든 MovementRule을 Piece에서 제거합니다
+        /// RemoveFromPiece에서 호출하세요
+        /// </summary>
+        /// <param name="piece">Rule을 제거할 Piece</param>
+        protected void RemoveTrackedRules(Piece piece)
+        {
+            if (piece == null) return;
+
+            var state = MutationManager.Instance.GetMutationState(piece, this);
+            if (state == null) return;
+
+            foreach (var rule in state.AddedRules)
+            {
+                piece.RemoveMovementRule(rule);
+            }
+
+            state.ClearTrackedRules();
+        }
+
+        #endregion
     }
 }

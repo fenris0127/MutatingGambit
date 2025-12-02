@@ -5,6 +5,8 @@ using System.Collections.Generic;
 namespace MutatingGambit.Systems.Mutations
 {
     /// <summary>
+    /// 그림자 폰 변이: 폰이 이전 위치에 그림자 복사본을 남깁니다.
+    /// 그림자는 1턴 동안 이동을 차단하지만 잡을 수는 없습니다.
     /// Shadow Pawn Mutation: Pawn leaves a shadow copy at its previous position.
     /// Shadow blocks movement for 1 turn but cannot capture.
     /// </summary>

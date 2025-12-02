@@ -5,6 +5,8 @@ using MutatingGambit.Core.MovementRules;
 namespace MutatingGambit.Systems.Mutations
 {
     /// <summary>
+    /// 광폭한 퀸 변이: 퀸이 선택한 방향으로 최대 거리까지만 이동할 수 있습니다.
+    /// 중간에 멈출 수 없는 전부 아니면 전무 이동 방식입니다.
     /// Berserk Queen Mutation: Queen must move to the maximum distance in chosen direction.
     /// Cannot stop mid-way - all or nothing movement.
     /// </summary>
@@ -41,6 +43,7 @@ namespace MutatingGambit.Systems.Mutations
     }
 
     /// <summary>
+    /// 광폭한 퀸을 위한 커스텀 이동 규칙 - 최대 거리로만 이동합니다.
     /// Custom movement rule for Berserk Queen - moves to maximum distance only.
     /// </summary>
     public class BerserkQueenRule : MovementRule

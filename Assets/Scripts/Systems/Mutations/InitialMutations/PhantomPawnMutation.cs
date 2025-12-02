@@ -5,6 +5,8 @@ using MutatingGambit.Core.MovementRules;
 namespace MutatingGambit.Systems.Mutations
 {
     /// <summary>
+    /// 유령 폰 변이: 폰이 1칸 대신 3칸 앞으로 이동할 수 있습니다.
+    /// 유령 같고 공격적인 폰을 만듭니다.
     /// Phantom Pawn Mutation: Pawn can move 3 squares forward instead of 1.
     /// Creates a ghostly, aggressive pawn.
     /// </summary>

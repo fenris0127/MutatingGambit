@@ -10,8 +10,8 @@ namespace MutatingGambit.Systems.Mutations
     [CreateAssetMenu(fileName = "DoubleMoveRookMutation", menuName = "Mutating Gambit/Mutations/Double Move Rook")]
     public class DoubleMoveRookMutation : Mutation
     {
-        private bool hasBonusMove = false;
-        private Vector2Int lastMoveDirection;
+        private const string KEY_HAS_BONUS_MOVE = "hasBonusMove";
+        private const string KEY_LAST_MOVE_DIR = "lastMoveDirection";
 
         public override void ApplyToPiece(Piece piece)
         {
@@ -21,12 +21,20 @@ namespace MutatingGambit.Systems.Mutations
                 return;
             }
 
+            // 상태 초기화
+            var state = MutationManager.Instance.GetMutationState(piece, this);
+            if (state != null)
+            {
+                state.SetData(KEY_HAS_BONUS_MOVE, false);
+                state.SetData(KEY_LAST_MOVE_DIR, Vector2Int.zero);
+            }
+
             Debug.Log($"Applied Double Move Rook mutation to {piece.Team} rook");
         }
 
         public override void RemoveFromPiece(Piece piece)
         {
-            hasBonusMove = false;
+            // 상태는 MutationManager에서 자동으로 정리됨
         }
 
         public override void OnMove(Piece mutatedPiece, Vector2Int from, Vector2Int to, Board board)
@@ -36,20 +44,24 @@ namespace MutatingGambit.Systems.Mutations
                 return;
             }
 
+            var state = MutationManager.Instance.GetMutationState(mutatedPiece, this);
+            if (state == null) return;
+
             Vector2Int moveDirection = to - from;
+            bool hasBonusMove = state.GetData(KEY_HAS_BONUS_MOVE, false);
 
             if (!hasBonusMove)
             {
                 // First move - grant bonus move
-                hasBonusMove = true;
-                lastMoveDirection = moveDirection;
+                state.SetData(KEY_HAS_BONUS_MOVE, true);
+                state.SetData(KEY_LAST_MOVE_DIR, moveDirection);
 
                 Debug.Log($"Rook at {to} has a bonus move available!");
             }
             else
             {
                 // Used bonus move
-                hasBonusMove = false;
+                state.SetData(KEY_HAS_BONUS_MOVE, false);
                 Debug.Log($"Rook at {to} used bonus move");
             }
         }
@@ -57,14 +69,19 @@ namespace MutatingGambit.Systems.Mutations
         /// <summary>
         /// Call this to check if the rook has a bonus move available.
         /// </summary>
-        public bool HasBonusMove => hasBonusMove;
+        public bool GetHasBonusMove(Piece piece)
+        {
+            var state = MutationManager.Instance.GetMutationState(piece, this);
+            return state?.GetData(KEY_HAS_BONUS_MOVE, false) ?? false;
+        }
 
         /// <summary>
         /// Resets the bonus move state (call at turn end).
         /// </summary>
-        public void ResetBonusMove()
+        public void ResetBonusMove(Piece piece)
         {
-            hasBonusMove = false;
+            var state = MutationManager.Instance.GetMutationState(piece, this);
+            state?.SetData(KEY_HAS_BONUS_MOVE, false);
         }
     }
 }

@@ -4,6 +4,8 @@ using MutatingGambit.Core.ChessEngine;
 namespace MutatingGambit.Systems.Mutations
 {
     /// <summary>
+    /// 순간이동 나이트 변이: 이동 후 나이트가 무작위 유효한 칸으로 순간이동합니다.
+    /// 예측 불가능하고 혼란스러운 이동 패턴입니다.
     /// Teleporting Knight Mutation: After moving, knight teleports to a random valid square.
     /// Unpredictable and chaotic movement pattern.
     /// </summary>

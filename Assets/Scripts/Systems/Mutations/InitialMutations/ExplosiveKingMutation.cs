@@ -5,6 +5,8 @@ using System.Collections.Generic;
 namespace MutatingGambit.Systems.Mutations
 {
     /// <summary>
+    /// 폭발하는 킹 변이: 킹이 이동할 때 인접한 모든 적 기물에게 피해를 줍니다.
+    /// 공격적이고 적극적인 킹 전략을 만듭니다.
     /// Explosive King Mutation: King damages all adjacent enemy pieces when moving.
     /// Creates an offensive, aggressive king strategy.
     /// </summary>

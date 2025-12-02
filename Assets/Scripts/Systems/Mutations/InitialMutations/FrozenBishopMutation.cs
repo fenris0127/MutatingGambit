@@ -5,6 +5,8 @@ using System.Collections.Generic;
 namespace MutatingGambit.Systems.Mutations
 {
     /// <summary>
+    /// 얼어붙은 비숍 변이: 비숍이 이동 경로를 따라 임시 얼음 장애물을 남깁니다.
+    /// 2턴 동안 지속되는 전술적 얼음 장벽을 만듭니다.
     /// Frozen Bishop Mutation: Bishop leaves temporary ice obstacles along its path.
     /// Creates tactical frozen barriers that last for 2 turns.
     /// </summary>
