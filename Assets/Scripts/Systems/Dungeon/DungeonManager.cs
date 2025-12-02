@@ -156,8 +156,10 @@ namespace MutatingGambit.Systems.Dungeon
                 return;
             }
 
-            LoadPlayerState(data);
-            LoadDungeonMap(data);
+            EnsurePlayerState();
+            var loader = new DungeonStateLoader(mapGenerator);
+            loader.LoadPlayerState(data, playerState);
+            currentDungeonMap = loader.LoadDungeonMap(data, out currentRoomNode);
             ShowMapUI();
 
             Debug.Log("던전 실행 로드 완료!");
@@ -359,6 +361,17 @@ namespace MutatingGambit.Systems.Dungeon
         }
 
         /// <summary>
+        /// 플레이어 상태가 있는지 확인합니다.
+        /// </summary>
+        private void EnsurePlayerState()
+        {
+            if (playerState == null)
+            {
+                playerState = new PlayerState();
+            }
+        }
+
+        /// <summary>
         /// 새 던전을 생성합니다.
         /// </summary>
         private void GenerateNewDungeon()
@@ -392,125 +405,7 @@ namespace MutatingGambit.Systems.Dungeon
         }
         #endregion
 
-        #region 비공개 메서드 - 던전 로드
-        /// <summary>
-        /// 플레이어 상태를 로드합니다.
-        /// </summary>
-        private void LoadPlayerState(GameSaveData data)
-        {
-            EnsurePlayerState();
-            LoadLibraries(out var mutationLib, out var artifactLib);
-            ApplyPlayerData(data, mutationLib, artifactLib);
-            LoadArtifacts(data, artifactLib);
-        }
 
-        /// <summary>
-        /// 플레이어 상태가 있는지 확인합니다.
-        /// </summary>
-        private void EnsurePlayerState()
-        {
-            if (playerState == null)
-            {
-                playerState = new PlayerState();
-            }
-        }
-
-        /// <summary>
-        /// 라이브러리들을 로드합니다.
-        /// </summary>
-        private void LoadLibraries(
-            out Mutations.MutationLibrary mutationLib,
-            out Artifacts.ArtifactLibrary artifactLib)
-        {
-            mutationLib = Resources.Load<Mutations.MutationLibrary>("MutationLibrary");
-            artifactLib = Resources.Load<Artifacts.ArtifactLibrary>("ArtifactLibrary");
-        }
-
-        /// <summary>
-        /// 플레이어 데이터를 적용합니다.
-        /// </summary>
-        private void ApplyPlayerData(
-            GameSaveData data,
-            Mutations.MutationLibrary mutationLib,
-            Artifacts.ArtifactLibrary artifactLib)
-        {
-            playerState.LoadFromSaveData(data.PlayerData, mutationLib, artifactLib);
-            playerState.Currency = data.Gold;
-        }
-
-        /// <summary>
-        /// 아티팩트들을 로드합니다.
-        /// </summary>
-        private void LoadArtifacts(GameSaveData data, Artifacts.ArtifactLibrary artifactLib)
-        {
-            if (data.ActiveArtifactNames == null)
-            {
-                return;
-            }
-
-            foreach (var artName in data.ActiveArtifactNames)
-            {
-                LoadSingleArtifact(artName, artifactLib);
-            }
-        }
-
-        /// <summary>
-        /// 단일 아티팩트를 로드합니다.
-        /// </summary>
-        private void LoadSingleArtifact(string name, Artifacts.ArtifactLibrary library)
-        {
-            var artifact = library.GetArtifactByName(name);
-            if (artifact != null)
-            {
-                playerState.AddArtifact(artifact);
-            }
-        }
-
-        /// <summary>
-        /// 던전 맵을 로드합니다.
-        /// </summary>
-        private void LoadDungeonMap(GameSaveData data)
-        {
-            if (mapGenerator == null)
-            {
-                return;
-            }
-
-            int seed = DetermineSeed(data);
-            GenerateMapWithSeed(seed);
-            RestoreCurrentRoom(data);
-        }
-
-        /// <summary>
-        /// 시드를 결정합니다.
-        /// </summary>
-        private int DetermineSeed(GameSaveData data)
-        {
-            return data.DungeonSeed != 0
-                ? data.DungeonSeed
-                : Random.Range(int.MinValue, int.MaxValue);
-        }
-
-        /// <summary>
-        /// 시드를 사용하여 맵을 생성합니다.
-        /// </summary>
-        private void GenerateMapWithSeed(int seed)
-        {
-            currentDungeonMap = mapGenerator.GenerateMap(5, 2, 4, seed);
-        }
-
-        /// <summary>
-        /// 현재 방을 복원합니다.
-        /// </summary>
-        private void RestoreCurrentRoom(GameSaveData data)
-        {
-            if (currentDungeonMap != null &&
-                currentDungeonMap.AllNodes.Count > data.CurrentRoomIndex)
-            {
-                currentRoomNode = currentDungeonMap.AllNodes[data.CurrentRoomIndex];
-            }
-        }
-        #endregion
 
         #region 비공개 메서드 - 방 진입
         /// <summary>

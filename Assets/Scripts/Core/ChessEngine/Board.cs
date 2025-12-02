@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using MutatingGambit.Core.MovementRules;
 using MutatingGambit.Systems.Artifacts;
@@ -314,12 +313,8 @@ namespace MutatingGambit.Core.ChessEngine
         /// <returns>보드의 문자열 표현</returns>
         public override string ToString()
         {
-            var result = new StringBuilder();
-            AppendBoardHeader(result);
-            AppendBoardRows(result);
-            AppendColumnLabels(result);
-
-            return result.ToString();
+            var debugger = new BoardDebugger(this);
+            return debugger.GenerateBoardString(pieces, obstacles);
         }
         #endregion
 
@@ -352,7 +347,7 @@ namespace MutatingGambit.Core.ChessEngine
         /// </summary>
         private GameObject CreatePieceObject(PieceType type, Team team)
         {
-            string objectName = "{team}_{type}";
+            string objectName = $"{team}_{type}";
 
             if (piecePrefab != null)
             {
@@ -434,7 +429,7 @@ namespace MutatingGambit.Core.ChessEngine
         /// </summary>
         private void LogInvalidPosition(Vector2Int position)
         {
-            Debug.LogError("잘못된 위치에 기물을 배치할 수 없습니다: {position}");
+            Debug.LogError($"잘못된 위치에 기물을 배치할 수 없습니다: {position}");
         }
         #endregion
 
@@ -573,115 +568,6 @@ namespace MutatingGambit.Core.ChessEngine
         }
         #endregion
 
-        #region 비공개 메서드 - 디버깅
-        /// <summary>
-        /// 보드 헤더를 추가합니다.
-        /// </summary>
-        private void AppendBoardHeader(StringBuilder result)
-        {
-            result.AppendLine($"보드 ({width}x{height}):");
-        }
 
-        /// <summary>
-        /// 보드의 모든 행을 추가합니다.
-        /// </summary>
-        private void AppendBoardRows(StringBuilder result)
-        {
-            for (int y = height - 1; y >= 0; y--)
-            {
-                AppendSingleRow(result, y);
-            }
-        }
-
-        /// <summary>
-        /// 단일 행을 추가합니다.
-        /// </summary>
-        private void AppendSingleRow(StringBuilder result, int y)
-        {
-            result.Append($"{y + 1} ");
-            AppendRowCells(result, y);
-            result.AppendLine();
-        }
-
-        /// <summary>
-        /// 행의 모든 셀을 추가합니다.
-        /// </summary>
-        private void AppendRowCells(StringBuilder result, int y)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                AppendCellSymbol(result, x, y);
-            }
-        }
-
-        /// <summary>
-        /// 셀의 심볼을 추가합니다.
-        /// </summary>
-        private void AppendCellSymbol(StringBuilder result, int x, int y)
-        {
-            var piece = pieces[x, y];
-            
-            if (piece != null)
-            {
-                result.Append(GetPieceSymbol(piece));
-            }
-            else if (obstacles[x, y])
-            {
-                result.Append("# ");
-            }
-            else
-            {
-                result.Append(". ");
-            }
-        }
-
-        /// <summary>
-        /// 열 라벨을 추가합니다.
-        /// </summary>
-        private void AppendColumnLabels(StringBuilder result)
-        {
-            result.Append("  ");
-            for (int x = 0; x < width; x++)
-            {
-                result.Append((char)('a' + x) + " ");
-            }
-        }
-
-        /// <summary>
-        /// 기물의 심볼 문자열을 가져옵니다.
-        /// </summary>
-        /// <param name="piece">기물</param>
-        /// <returns>심볼 문자열</returns>
-        private string GetPieceSymbol(Piece piece)
-        {
-            string symbol = GetBasePieceSymbol(piece.Type);
-            return FormatSymbolForTeam(symbol, piece.Team);
-        }
-
-        /// <summary>
-        /// 기본 기물 심볼을 가져옵니다.
-        /// </summary>
-        private string GetBasePieceSymbol(PieceType type)
-        {
-            return type switch
-            {
-                PieceType.King => "K",
-                PieceType.Queen => "Q",
-                PieceType.Rook => "R",
-                PieceType.Bishop => "B",
-                PieceType.Knight => "N",
-                PieceType.Pawn => "P",
-                _ => "?"
-            };
-        }
-
-        /// <summary>
-        /// 팀에 맞게 심볼을 포맷팅합니다.
-        /// </summary>
-        private string FormatSymbolForTeam(string symbol, Team team)
-        {
-            return team == Team.White ? symbol + " " : symbol.ToLower();
-        }
-        #endregion
     }
 }

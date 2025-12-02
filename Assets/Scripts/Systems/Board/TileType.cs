@@ -1,27 +1,27 @@
 namespace MutatingGambit.Systems.BoardSystem
 {
     /// <summary>
-    /// Defines the types of tiles that can exist on the board.
+    /// 보드에 존재할 수 있는 타일의 타입을 정의합니다.
     /// </summary>
     public enum TileType
     {
         /// <summary>
-        /// Standard playable tile.
+        /// 표준 플레이 가능 타일입니다.
         /// </summary>
         Normal,
 
         /// <summary>
-        /// Impassable obstacle tile (pieces cannot move through or onto this).
+        /// 통과 불가능한 장애물 타일입니다 (기물이 이동하거나 위에 놓일 수 없음).
         /// </summary>
         Obstacle,
 
         /// <summary>
-        /// Water tile (may have special rules in the future).
+        /// 물 타일입니다 (향후 특수 규칙이 적용될 수 있음).
         /// </summary>
         Water,
 
         /// <summary>
-        /// Void tile (out of bounds, used for non-rectangular boards).
+        /// 공허 타일입니다 (경계 밖, 비직사각형 보드에 사용됨).
         /// </summary>
         Void
     }

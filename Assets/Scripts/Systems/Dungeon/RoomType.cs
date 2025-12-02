@@ -1,47 +1,47 @@
 namespace MutatingGambit.Systems.Dungeon
 {
     /// <summary>
-    /// Defines the types of rooms available in the dungeon.
+    /// 던전에서 사용 가능한 방의 타입을 정의합니다.
     /// </summary>
     public enum RoomType
     {
         /// <summary>
-        /// Normal combat encounter with basic enemies.
+        /// 기본 적과의 일반 전투 조우입니다.
         /// </summary>
         NormalCombat,
 
         /// <summary>
-        /// Elite combat encounter with mutated enemies and better rewards.
+        /// 변이된 적과의 엘리트 전투 조우입니다 (더 나은 보상).
         /// </summary>
         EliteCombat,
 
         /// <summary>
-        /// Boss encounter at the end of a floor.
+        /// 층 끝의 보스 조우입니다.
         /// </summary>
         Boss,
 
         /// <summary>
-        /// Treasure room - grants an artifact immediately.
+        /// 보물 방 - 즉시 아티팩트를 부여합니다.
         /// </summary>
         Treasure,
 
         /// <summary>
-        /// Rest room - repair broken pieces or upgrade pieces.
+        /// 휴식 방 - 파손된 기물을 수리하거나 기물을 업그레이드합니다.
         /// </summary>
         Rest,
 
         /// <summary>
-        /// Mystery event room with random encounters.
+        /// 무작위 조우가 있는 미스터리 이벤트 방입니다.
         /// </summary>
         Mystery,
 
         /// <summary>
-        /// Starting room of the dungeon.
+        /// 던전의 시작 방입니다.
         /// </summary>
         Start,
 
         /// <summary>
-        /// Tutorial room for teaching game mechanics.
+        /// 게임 메커니즘을 가르치는 튜토리얼 방입니다.
         /// </summary>
         Tutorial
     }

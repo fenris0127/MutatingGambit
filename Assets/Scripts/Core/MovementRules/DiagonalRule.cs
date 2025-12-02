@@ -1,113 +1,64 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MutatingGambit.Core.MovementRules
 {
     /// <summary>
-    /// Movement rule for diagonal movement.
-    /// Used by Bishop and Queen pieces.
+    /// 대각선 움직임 규칙입니다.
+    /// Bishop과 Queen 기물에 사용됩니다.
     /// </summary>
     [CreateAssetMenu(fileName = "DiagonalRule", menuName = "Movement Rules/Diagonal Rule")]
-    public class DiagonalRule : MovementRule
+    public class DiagonalRule : DirectionalMovementRule
     {
+        #region 필드
         [SerializeField]
-        [Tooltip("Maximum distance the piece can move. -1 for unlimited.")]
-        private int maxDistance = -1;
-
-        [SerializeField]
-        [Tooltip("If true, piece must move exactly the max distance (e.g., Glass Bishop mutation).")]
+        [Tooltip("true이면 기물이 정확히 최대 거리만큼 이동해야 합니다 (예: Glass Bishop 변이).")]
         private bool exactDistance = false;
+        #endregion
 
-        public override List<Vector2Int> GetValidMoves(
-            IBoard board,
-            Vector2Int fromPosition,
-            ChessEngine.Team pieceTeam)
+        #region 보호된 메서드 - 방향
+        /// <summary>
+        /// 대각선 방향들을 가져옵니다 (4개 대각선).
+        /// </summary>
+        protected override Vector2Int[] GetDirections()
         {
-            var validMoves = new List<Vector2Int>();
-
-            // Four diagonal directions
-            Vector2Int[] directions = new Vector2Int[]
+            return new Vector2Int[]
             {
-                new Vector2Int(1, 1),    // Up-Right
-                new Vector2Int(1, -1),   // Down-Right
-                new Vector2Int(-1, 1),   // Up-Left
-                new Vector2Int(-1, -1)   // Down-Left
+                new Vector2Int(1, 1),    // 우상
+                new Vector2Int(1, -1),   // 우하
+                new Vector2Int(-1, 1),   // 좌상
+                new Vector2Int(-1, -1)   // 좌하
             };
-
-            foreach (var direction in directions)
-            {
-                AddMovesInDirection(board, fromPosition, direction, pieceTeam, validMoves);
-            }
-
-            return validMoves;
         }
+        #endregion
 
-        private void AddMovesInDirection(
-            IBoard board,
-            Vector2Int fromPosition,
-            Vector2Int direction,
-            ChessEngine.Team pieceTeam,
-            List<Vector2Int> validMoves)
+        #region 보호된 메서드 - 거리 검증 (오버라이드)
+        /// <summary>
+        /// 빈 칸으로 이동할 수 있는지 확인합니다.
+        /// exactDistance가 true면 정확한 거리만 허용합니다.
+        /// </summary>
+        protected override bool CanMoveToEmptySquare(int distance)
         {
-            Vector2Int currentPos = fromPosition + direction;
-            int distanceMoved = 1;
-
-            while (board.IsPositionValid(currentPos))
+            if (!exactDistance)
             {
-                // Check if we've reached max distance
-                if (maxDistance > 0 && distanceMoved > maxDistance)
-                {
-                    break;
-                }
-
-                // Check for obstacles
-                if (board.IsObstacle(currentPos))
-                {
-                    break;
-                }
-
-                bool isValidSquare = false;
-
-                // Empty square
-                if (IsEmptyPosition(board, currentPos))
-                {
-                    isValidSquare = true;
-                }
-                // Friendly piece - blocked
-                else if (IsFriendlyPiece(board, currentPos, pieceTeam))
-                {
-                    // If exact distance required, check if we've reached it
-                    if (exactDistance && maxDistance > 0 && distanceMoved == maxDistance)
-                    {
-                        // Can't land on friendly piece even at exact distance
-                    }
-                    break;
-                }
-                // Enemy piece - can capture but can't move beyond
-                else if (IsEnemyPiece(board, currentPos, pieceTeam))
-                {
-                    isValidSquare = true;
-
-                    // Add this move if it meets distance requirements
-                    if (!exactDistance || (maxDistance <= 0 || distanceMoved == maxDistance))
-                    {
-                        validMoves.Add(currentPos);
-                    }
-                    break;
-                }
-
-                // Add move if it meets distance requirements
-                if (isValidSquare)
-                {
-                    if (!exactDistance || (maxDistance <= 0 || distanceMoved == maxDistance))
-                    {
-                        validMoves.Add(currentPos);
-                    }
-                }
-
-                currentPos += direction;
-                distanceMoved++;
+                return true; // 정확한 거리 불필요 - 모든 빈 칸 허용
             }
+
+            return maxDistance <= 0 || distance == maxDistance;
         }
+
+        /// <summary>
+        /// 해당 거리에서 캡처할 수 있는지 확인합니다.
+        /// exactDistance가 true면 정확한 거리만 허용합니다.
+        /// </summary>
+        protected override bool CanCaptureAtDistance(int distance)
+        {
+            if (!exactDistance)
+            {
+                return true; // 정확한 거리 불필요 - 모든 거리에서 캡처 허용
+            }
+
+            return maxDistance <= 0 || distance == maxDistance;
+        }
+        #endregion
     }
 }

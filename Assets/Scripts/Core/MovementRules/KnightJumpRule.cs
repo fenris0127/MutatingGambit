@@ -4,56 +4,82 @@ using UnityEngine;
 namespace MutatingGambit.Core.MovementRules
 {
     /// <summary>
-    /// Movement rule for L-shaped knight jumps.
-    /// Knights can jump over other pieces.
+    /// L자 모양의 나이트 점프 움직임 규칙입니다.
+    /// 나이트는 다른 기물을 뛰어넘을 수 있습니다.
     /// </summary>
     [CreateAssetMenu(fileName = "KnightJumpRule", menuName = "Movement Rules/Knight Jump Rule")]
     public class KnightJumpRule : MovementRule
     {
+        #region 공개 메서드
+        /// <summary>
+        /// 나이트의 모든 유효한 L자 이동을 계산합니다.
+        /// </summary>
         public override List<Vector2Int> GetValidMoves(
             IBoard board,
             Vector2Int fromPosition,
             ChessEngine.Team pieceTeam)
         {
             var validMoves = new List<Vector2Int>();
-
-            // All 8 possible L-shaped knight moves
-            Vector2Int[] knightMoves = new Vector2Int[]
-            {
-                new Vector2Int(2, 1),    // Right 2, Up 1
-                new Vector2Int(2, -1),   // Right 2, Down 1
-                new Vector2Int(-2, 1),   // Left 2, Up 1
-                new Vector2Int(-2, -1),  // Left 2, Down 1
-                new Vector2Int(1, 2),    // Right 1, Up 2
-                new Vector2Int(1, -2),   // Right 1, Down 2
-                new Vector2Int(-1, 2),   // Left 1, Up 2
-                new Vector2Int(-1, -2)   // Left 1, Down 2
-            };
+            var knightMoves = GetKnightMoveOffsets();
 
             foreach (var move in knightMoves)
             {
-                Vector2Int targetPos = fromPosition + move;
-
-                // Check if position is valid
-                if (!board.IsPositionValid(targetPos))
-                {
-                    continue;
-                }
-
-                // Check if position is an obstacle
-                if (board.IsObstacle(targetPos))
-                {
-                    continue;
-                }
-
-                // Can move to empty squares or capture enemy pieces
-                if (IsEmptyPosition(board, targetPos) || IsEnemyPiece(board, targetPos, pieceTeam))
-                {
-                    validMoves.Add(targetPos);
-                }
+                ProcessKnightMove(board, fromPosition, move, pieceTeam, validMoves);
             }
 
             return validMoves;
         }
+        #endregion
+
+        #region 비공개 메서드
+        /// <summary>
+        /// 나이트의 8가지 L자 이동 오프셋을 가져옵니다.
+        /// </summary>
+        private Vector2Int[] GetKnightMoveOffsets()
+        {
+            return new Vector2Int[]
+            {
+                new Vector2Int(2, 1),    // 우 2, 상 1
+                new Vector2Int(2, -1),   // 우 2, 하 1
+                new Vector2Int(-2, 1),   // 좌 2, 상 1
+                new Vector2Int(-2, -1),  // 좌 2, 하 1
+                new Vector2Int(1, 2),    // 우 1, 상 2
+                new Vector2Int(1, -2),   // 우 1, 하 2
+                new Vector2Int(-1, 2),   // 좌 1, 상 2
+                new Vector2Int(-1, -2)   // 좌 1, 하 2
+            };
+        }
+
+        /// <summary>
+        /// 단일 나이트 이동을 처리합니다.
+        /// </summary>
+        private void ProcessKnightMove(
+            IBoard board,
+            Vector2Int fromPosition,
+            Vector2Int moveOffset,
+            ChessEngine.Team pieceTeam,
+            List<Vector2Int> validMoves)
+        {
+            Vector2Int targetPos = fromPosition + moveOffset;
+
+            if (!IsValidKnightDestination(board, targetPos, pieceTeam))
+            {
+                return;
+            }
+
+            validMoves.Add(targetPos);
+        }
+
+        /// <summary>
+        /// 나이트 목적지가 유효한지 확인합니다.
+        /// </summary>
+        private bool IsValidKnightDestination(IBoard board, Vector2Int position, ChessEngine.Team pieceTeam)
+        {
+            if (!board.IsPositionValid(position)) return false;
+            if (board.IsObstacle(position)) return false;
+
+            return IsEmptyPosition(board, position) || IsEnemyPiece(board, position, pieceTeam);
+        }
+        #endregion
     }
 }
